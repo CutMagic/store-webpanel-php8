@@ -25,9 +25,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\StoreUser;
-use Ehesp\SteamLogin\Laravel\Facades\SteamLogin;
+use App\Support\SteamOpenId; // [php82] remplace ehesp/steam-login
 use App\Http\Controllers\UserPanel\SteamConvertController;
-use Mockery\CountValidator\Exception;
 use Log;
 
 class AuthController extends Controller
@@ -54,6 +53,8 @@ class AuthController extends Controller
      */
     public function serverlogin(Request $request)
     {
+        // [multimod] Le Store 1.2 n'a pas de jeton de connexion (colonnes token / ip) : connexion par Steam uniquement.
+        abort(404);
         $token = $request->input("token");
         $userid = intval($request->input("userid"));
         $page = $request->input("page");
@@ -179,7 +180,7 @@ class AuthController extends Controller
         //Handle the return and try to validate it
         try
         {
-            $community = SteamLogin::validate();
+            $community = SteamOpenId::validate($request); // [php82]
         }
         catch(\Exception $e)
         { //If not possible show 401 error
@@ -188,8 +189,9 @@ class AuthController extends Controller
             abort(401);
         }
         //Get the auth string for the steamid64
-        $steam = SteamConvertController::communityid_to_steam($community);
-        $auth = SteamConvertController::steamid_to_auth($steam);
+        // [php82] auth du Store = AccountID = SteamID64 - 76561197960265728 (entiers 64 bits, sans bcmath)
+        $auth = (int) $community - 76561197960265728;
+        $steam = SteamConvertController::auth_to_steamid($auth);
 
         Log::debug("Successful Stem Auth",["CommunityID" => $community,"SteamID"=>$steam,"auth" => $auth]);
 
@@ -201,17 +203,34 @@ class AuthController extends Controller
         catch(\Exception $e)
         {
             Log::notice("User does not exist in db",["auth" => $auth]);
-            view()->share('message','You have to play on the server before you can use the UserPanel');
+            view()->share('message',"Tu dois d'abord jouer sur un de nos serveurs avant de pouvoir utiliser l'espace joueur.");
             abort(401);
         }
 
         //Set the session vars
+        $request->session()->regenerate(); // [multimod] nouvelle session à la connexion (anti fixation de session)
         $request->session()->put('store_user_authmethod','steam_openid');
         $request->session()->put('store_user_id',$user->id);
         $request->session()->put('store_user_name',$user->name);
         $request->session()->put('store_user_auth',$user->auth);
 
         //Redirect the user to the User Dashboard
+        return redirect()->route('userpanel.dashboard');
+    }
+
+    /**
+     * [multimod] Connexion de TEST, pour essayer l'espace joueur en local sans Steam.
+     * Ne fonctionne que si APP_ENV=local ET USERPANEL_DEV_LOGIN=true dans le .env (jamais en production).
+     */
+    public function devlogin(Request $request, $userid)
+    {
+        if (env('APP_ENV') !== 'local' || env('USERPANEL_DEV_LOGIN', false) !== true) abort(404);
+        $user = StoreUser::findOrFail(intval($userid));
+        $request->session()->regenerate(); // [multimod] nouvelle session à la connexion (anti fixation de session)
+        $request->session()->put('store_user_authmethod', 'dev');
+        $request->session()->put('store_user_id', $user->id);
+        $request->session()->put('store_user_name', $user->name);
+        $request->session()->put('store_user_auth', $user->auth);
         return redirect()->route('userpanel.dashboard');
     }
 
@@ -223,8 +242,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->session()->forget("store_user_id");
-        echo "logged out";
-        //TODO: Add a proper view
+        // [multimod] vraie déconnexion + retour à la page de connexion
+        $request->session()->forget(["store_user_id", "store_user_name", "store_user_auth", "store_user_authmethod"]);
+        return redirect()->route('userpanel.auth.index');
     }
 }

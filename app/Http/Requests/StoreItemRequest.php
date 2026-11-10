@@ -44,17 +44,17 @@ class StoreItemRequest extends Request
             'name' => 'required', //TODO: Check for no whitespaces
             'display_name' => 'required',
             'description' => 'required',
-            'web_description',
+            'web_description' => 'nullable', // [php82] règle sans nom refusée par Laravel 12
             'type' => 'required',
             'loadout_slot' => 'required',
             'price' => 'required|numeric',
             'category_id' => 'required',
-            'attrs', //TODO: Perfom JSON Validation on the Attrs field
-            'is_buyable',
-            'is_tradeable',
-            'is_refundable',
-            'expiry_time',
-            'flags',
+            'attrs' => 'nullable', // [php82] TODO: Perfom JSON Validation on the Attrs field
+            'is_buyable' => 'nullable', // [php82] règle sans nom refusée par Laravel 12
+            'is_tradeable' => 'nullable', // [php82] règle sans nom refusée par Laravel 12
+            'is_refundable' => 'nullable', // [php82] règle sans nom refusée par Laravel 12
+            'expiry_time' => 'nullable', // [php82] règle sans nom refusée par Laravel 12
+            'flags' => 'nullable', // [php82] règle sans nom refusée par Laravel 12
         ];
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,26 +15,36 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Tableau de bord du joueur : crédits, objets, objets équipés, derniers achats.
 
 namespace App\Http\Controllers\UserPanel;
 
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Models\StoreUser;
+use DB;
+use App\Support\Utf8;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
     public function getIndex(Request $request)
     {
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.empty');
-        //TODO: ADD Oviewview of the userprofile (owned credits, number of owned items, ...)
-        //TODO: ADD Option to refresh steam picture
-    }
+        $user = StoreUser::findOrFail($request->session()->get('store_user_id'));
+        $st = DB::connection('store');
 
+        $itemCount = $user->userItems()->count();
+        $equippedCount = $st->table('users_items_loadouts')
+            ->join('users_items', 'users_items.id', '=', 'users_items_loadouts.useritem_id')
+            ->where('users_items.user_id', $user->id)->count();
+        $latest = $st->table('users_items')->join('items', 'items.id', '=', 'users_items.item_id')
+            ->where('users_items.user_id', $user->id)
+            ->orderBy('users_items.acquire_date', 'desc')->orderBy('users_items.id', 'desc')->take(10)
+            ->get(['items.display_name', 'items.type', 'users_items.acquire_date', 'users_items.acquire_method']);
+        $latest = Utf8::cleanRows($latest); // [multimod]
+        $rank = $st->table('users')->where('credits', '>', $user->credits)->count() + 1;
+
+        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.dashboard',
+            compact('user', 'itemCount', 'equippedCount', 'latest', 'rank'));
+    }
 }

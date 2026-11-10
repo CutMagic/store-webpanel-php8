@@ -1,5 +1,4 @@
-<?php namespace App\Models;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,33 +15,52 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Adapté au schéma du Store 1.2 (store_items, sans dates ni clés étrangères).
+
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StoreItem extends Model
 {
+    use RestrictedToServers, CleansUtf8;
+
     protected $connection = 'store';
     protected $table = 'items';
+    public $timestamps = false;
     protected $fillable = ['priority','name','display_name','description','web_description','type','loadout_slot','price','category_id','attrs','is_buyable','is_tradeable','is_refundable','expiry_time','flags','enable_server_restriction'];
+
+    protected $serverPivotTable = 'servers_items';
+    protected $serverPivotKey = 'item_id';
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Supprime aussi les exemplaires possédés par les joueurs (et leurs équipements).
+        static::deleting(function (StoreItem $item) {
+            foreach ($item->userItems()->get() as $userItem) {
+                $userItem->delete();
+            }
+            $item->deleteServerRestrictions();
+        });
+    }
+
+    /** Exemplaires de cet objet possédés par les joueurs (une ligne store_users_items par exemplaire). */
+    public function userItems()
+    {
+        return $this->hasMany('App\Models\StoreUserItem', 'item_id', 'id');
+    }
 
     public function users()
     {
-        return $this->belongsToMany('App\Models\StoreUser','users_items', 'item_id', 'user_id')->withTimestamps();
-    }
-
-    public function servers()
-    {
-        return $this->belongsToMany('App\Models\StoreServer','servers_items', 'item_id', 'server_id')->withTimestamps();
+        return $this->belongsToMany('App\Models\StoreUser', 'users_items', 'item_id', 'user_id')
+            ->withPivot('id', 'acquire_date', 'acquire_method');
     }
 
     public function category()
     {
-        return $this->belongsTo('App\Models\StoreCategory','category_id','id');
-    }
-
-    public function getServerListAttribute()
-    {
-        return $this->servers->lists('id');
+        return $this->belongsTo('App\Models\StoreCategory', 'category_id', 'id');
     }
 }

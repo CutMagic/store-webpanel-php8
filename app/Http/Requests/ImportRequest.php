@@ -39,8 +39,13 @@ class ImportRequest extends Request
      */
     public function rules()
     {
+        if ($this->route() && $this->route()->getName() !== 'webpanel.store.tools.import') {
+            return [];
+        }
         return [
-            // TODO: Add some validation rules
+            'import' => 'required|file|max:2048',
+            // [multimod] à l'envoi du fichier : obligatoire, 2 Mo maximum (le contenu doit être du JSON, vérifié ensuite)
+
         ];
     }
 

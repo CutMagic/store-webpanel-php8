@@ -1,80 +1,50 @@
-{{--Copyright (c) 2015 "Werner Maisl"--}}
-
-{{--This file is part of the Store Webpanel V2.--}}
-
-{{--The Store Webpanel V2 is free software: you can redistribute it and/or modify--}}
-{{--it under the terms of the GNU Affero General Public License as--}}
-{{--published by the Free Software Foundation, either version 3 of the--}}
-{{--License, or (at your option) any later version.--}}
-
-{{--This program is distributed in the hope that it will be useful,--}}
-{{--but WITHOUT ANY WARRANTY; without even the implied warranty of--}}
-{{--MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the--}}
-{{--GNU Affero General Public License for more details.--}}
-
-{{--You should have received a copy of the GNU Affero General Public License--}}
-{{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
+{{-- [multimod] Objets équipés par loadout (Store 1.2) --}}
 @extends('templates.adminlte205.userpanel.app')
 
-@section('title', 'Loadout')
+@section('title', 'Objets équipés')
 
-@section('subtitle', 'Overview')
+@section('subtitle', 'pris en compte à ta prochaine apparition en jeu')
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Loadout</li>
-    <li class="active">Overview</li>
+    <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> Accueil</a></li>
+    <li class="active">Objets équipés</li>
 @stop
 
 @section('content')
-    <div class="row">
-        <div class="col-md-12">
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">All Loadouts</h3>
-                </div><!-- /.box-header -->
-                <div class="box-body">
-                    <table class="table table-bordered table-striped" id="table">
-                        <thead>
+    <?php $slots = collect($owned)->groupBy('loadout_slot'); ?>
+    @foreach($loadouts as $i => $loadout)
+        <div class="box box-default {{ $i == 0 ? '' : 'collapsed-box' }}">
+            <div class="box-header with-border">
+                <h3 class="box-title">{{ $loadout->display_name }}
+                    <small>@if($loadout->game) {{ $loadout->game }} @endif @if($loadout->class) / {{ $loadout->class }} @endif @if($loadout->team) / équipe {{ $loadout->team }} @endif</small>
+                </h3>
+                <span class="label label-success">{{ isset($equipped[$loadout->id]) ? count($equipped[$loadout->id]) : 0 }} équipé(s)</span>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa {{ $i == 0 ? 'fa-minus' : 'fa-plus' }}"></i></button>
+                </div>
+            </div>
+            <div class="box-body no-padding">
+                <table class="table table-condensed">
+                    <tr><th style="width: 20%">Emplacement</th><th>Tes objets</th></tr>
+                    @forelse($slots as $slot => $items)
                         <tr>
-                            <th>Display Name</th>
-                            <th>Game</th>
-                            <th>Class</th>
-                            <th>Team</th>
-                            <th>Privacy</th>
-                            <th>Owner</th>
-                            <th>Action</th>
+                            <td><b>{{ $slot }}</b></td>
+                            <td>
+                                @foreach($items as $it)
+                                    <?php $on = isset($equipped[$loadout->id][$it->id]); ?>
+                                    {!! Form::open(['method' => 'post', 'style' => 'display:inline-block; margin: 2px', 'url' => route($on ? 'userpanel.loadouts.unequip' : 'userpanel.loadouts.equip', [$loadout->id, $it->id])]) !!}
+                                    <button type="submit" class="btn btn-xs {{ $on ? 'btn-success' : 'btn-default' }}" title="{{ $on ? 'Cliquer pour retirer' : 'Cliquer pour équiper' }}">
+                                        @if($on)<i class="fa fa-check"></i>@endif {{ $it->display_name }}
+                                    </button>
+                                    {!! Form::close() !!}
+                                @endforeach
+                            </td>
                         </tr>
-                        </thead>
-                    </table>
-                </div><!-- /.box-body -->
-            </div><!-- /.box -->
-        </div><!-- /.col -->
-    </div><!-- /.row -->
-    @stop
-
-    @section('footer')
-            <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="{{asset('templates/adminlte205/dist/css/jquery.dataTables.min.css')}}">
-    <!-- DataTables -->
-    <script type="text/javascript" charset="utf8" src="{{asset('templates/adminlte205/dist/js/jquery.dataTables.min.js')}}"></script>
-
-    <script>
-        $(document).ready( function () {
-            $('#table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: '{{ route("userpanel.loadouts.loadoutdata") }}',
-                columns: [
-                    {data: 'display_name', name: 'display_name'},
-                    {data: 'game', name: 'game'},
-                    {data: 'class', name: 'class'},
-                    {data: 'team', name: 'team'},
-                    {data: 'privacy', name: 'privacy'},
-                    {data: 'owner.name', name: 'owner'},
-                    {data: 'action', name: 'Action', orderable: false, searchable: false}
-                ]
-            });
-        } );
-    </script>
+                    @empty
+                        <tr><td colspan="2">Tu n'as aucun objet équipable. <a href="{{URL::route('userpanel.useritems.buyoverview')}}">Boutique</a></td></tr>
+                    @endforelse
+                </table>
+            </div>
+        </div>
+    @endforeach
 @stop

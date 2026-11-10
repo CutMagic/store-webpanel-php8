@@ -28,7 +28,7 @@
         <div class="login-box-body">
             <p class="login-box-msg">Sign in to start your session</p>
 
-            <a href="{{ SteamLogin::url(URL::route('userpanel.auth.steamlogin')) }}">Login via Steam!</a>
+            <a href="{{ \App\Support\SteamOpenId::url(URL::route('userpanel.auth.steamlogin')) }}">Login via Steam!</a>
 
         </div><!-- /.login-box-body -->
     </div><!-- /.login-box -->

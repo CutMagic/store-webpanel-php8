@@ -1,5 +1,4 @@
 <?php
-
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,186 +15,162 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Réécrit pour le Store 1.2 :
+//  - un exemplaire = une ligne store_users_items (plusieurs exemplaires possibles du même objet) ;
+//  - les tables du Store sont en MyISAM (pas de transactions) : chaque opération sur les crédits
+//    est une seule requête atomique, comme dans le plugin (credits = credits - prix WHERE credits >= prix) ;
+//  - les objets réservés à des flags admin (colonne flags) ne sont pas vendus sur le site,
+//    car le site ne peut pas vérifier les droits SourceMod du joueur.
 
 namespace App\Http\Controllers\UserPanel;
 
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\StoreUser;
 use App\Models\StoreItem;
-use Yajra\Datatables\Datatables;
+use App\Models\StoreUserItem;
 use Carbon\Carbon;
+use DB;
+use App\Support\Utf8;
+use Log;
 
 class UserItemsController extends Controller
 {
-    /**
-     * Show all useritems the user owns
-     *
-     * @return Response
-     */
-    public function getIndex()
+    private function currentUser(Request $request)
     {
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems.index');
+        return StoreUser::findOrFail($request->session()->get('store_user_id'));
     }
 
-    /**
-     * Show the items that are available for purchase
-     *
-     * @return Response
-     */
-    public function getBuyOverview()
+    /** Objet achetable sur le site ? */
+    public static function webBuyable(StoreItem $item)
     {
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems.buyoverview');
+        return $item->is_buyable == 1 && trim((string) $item->flags) == '' && $item->price >= 0;
     }
 
-
-    public function getBuy($item_id)
+    /** Inventaire du joueur, regroupé par objet. */
+    public function getIndex(Request $request)
     {
-        $item = StoreItem::find($item_id);
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems.buyconfirm', compact("item"));
+        $user = $this->currentUser($request);
+        // [multimod] Requêtes sans colonne non agrégée : valables même avec ONLY_FULL_GROUP_BY (MySQL 8 / MariaDB).
+        $counts = DB::connection('store')->table('users_items')->where('user_id', $user->id)
+            ->groupBy('item_id')
+            ->get(['item_id', DB::raw('COUNT(*) as quantity'), DB::raw('MAX(acquire_date) as last_acquired')]);
+        $byItem = [];
+        foreach ($counts as $c) $byItem[$c->item_id] = $c;
+        $owned = [];
+        if (!empty($byItem)) {
+            foreach (StoreItem::with('category')->whereIn('id', array_keys($byItem))->get() as $it) {
+                $owned[] = (object) [
+                    'id' => $it->id, 'display_name' => $it->display_name, 'description' => $it->description,
+                    'type' => $it->type, 'loadout_slot' => $it->loadout_slot, 'price' => $it->price,
+                    'is_refundable' => $it->is_refundable,
+                    'category' => $it->category ? $it->category->display_name : '',
+                    'quantity' => $byItem[$it->id]->quantity, 'last_acquired' => $byItem[$it->id]->last_acquired,
+                ];
+            }
+            usort($owned, function ($x, $y) { return strcasecmp($x->category . $x->display_name, $y->category . $y->display_name); });
+        }
+        $refundfee = (float) \Config::get('userpanel.items_refundfee');
+
+        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems.index', compact('owned', 'refundfee', 'user'));
     }
 
-    /**
-     * Perform the actual Purchase
-     *
-     * @return Response
-     */
+    /** Objets en vente sur le site. */
+    public function getBuyOverview(Request $request)
+    {
+        $user = $this->currentUser($request);
+        $items = StoreItem::with('category')->where('is_buyable', 1)
+            ->where(function ($q) { $q->whereNull('flags')->orWhere('flags', ''); })
+            ->orderBy('category_id')->orderBy('priority', 'desc')->orderBy('display_name')->get();
+
+        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems.buyoverview', compact('items', 'user'));
+    }
+
+    public function getBuy(Request $request, $item_id)
+    {
+        $user = $this->currentUser($request);
+        $item = StoreItem::findOrFail($item_id);
+        $owned = $user->userItems()->where('item_id', $item->id)->count();
+        $buyable = self::webBuyable($item);
+
+        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems.buyconfirm', compact('item', 'user', 'owned', 'buyable'));
+    }
+
+    /** Achat d'un exemplaire. */
     public function postBuy(Request $request, $item_id)
     {
-        //TODO: Add Logging
-        $user = StoreUser::find($request->session()->get('store_user_id'));
-        $item = StoreItem::find($item_id);
+        $user = $this->currentUser($request);
+        $item = StoreItem::findOrFail($item_id);
 
-
-        //Check if item can be bought
-        if ($item->is_buyable == 0) abort(400);
-
-        //Check if the user has got enough credits
-        if($user->credits >= $item->price)
-        {
-            $user->credits = $user->credits - $item->price;
-            $user->save();
-            $user->items()->attach($item->id, ['acquire_method' => 'web','acquire_date'=> Carbon::now()->toDateTimeString()]);
-            return redirect()->route('userpanel.useritems.index');
+        if (!self::webBuyable($item)) {
+            return redirect()->route('userpanel.useritems.buyoverview')->withErrors(["Cet objet ne peut pas être acheté sur le site."]);
         }
-        else
-        {
-            abort(402);
+
+        $st = DB::connection('store');
+        // Retire les crédits seulement s'il en a assez (une seule requête : pas de double achat possible).
+        $paid = $st->table('users')->where('id', $user->id)->where('credits', '>=', $item->price)
+            ->decrement('credits', $item->price);
+        if ($paid != 1) {
+            return redirect()->route('userpanel.useritems.buyconf', ['item_id' => $item->id])->withErrors(["Tu n'as pas assez de crédits."]);
         }
+
+        try {
+            $st->table('users_items')->insert([
+                'user_id' => $user->id,
+                'item_id' => $item->id,
+                'acquire_date' => Carbon::now()->toDateTimeString(),
+                'acquire_method' => 'web',
+            ]);
+        } catch (\Exception $e) {
+            // L'objet n'a pas pu être ajouté : on rend les crédits.
+            $st->table('users')->where('id', $user->id)->increment('credits', $item->price);
+            Log::error('[userpanel] achat échoué', ['user' => $user->id, 'item' => $item->id, 'err' => $e->getMessage()]);
+            return redirect()->route('userpanel.useritems.buyoverview')->withErrors(["L'achat a échoué, tes crédits ont été rendus."]);
+        }
+
+        Log::info('[userpanel] achat', ['user' => $user->id, 'auth' => $user->auth, 'item' => $item->name, 'price' => $item->price]);
+        return redirect()->route('userpanel.useritems.index')->with('message', 'Achat réussi : ' . $item->display_name);
     }
 
     /**
-     * Remove the item and refund credits if item is refundable
-     *
-     * @param  int  $id
-     * @return Response
+     * Vend (ou jette, si l'objet n'est pas remboursable) un exemplaire, ou tous les exemplaires.
+     * On retire d'abord les exemplaires NON équipés.
      */
     public function postSell(Request $request, $item_id)
     {
-        //TODO: Add Logging
-        //TODO: Add Tests
+        $user = $this->currentUser($request);
+        $item = StoreItem::findOrFail($item_id);
+        $all = $request->input('all') == '1';
 
-        $single_item = $request->input("single_item");
-        if(!isset($single_item) || $single_item = NULL) $single_item = true;
-
-        $user = StoreUser::find($request->session()->get('store_user_id'));
-        $item = StoreItem::find($item_id);
-
-        //Check if the user ownes the item before removing it
-        $owned_items = $user->items()->where('item_id',$item->id)->count();
-
-        if($owned_items <= 0)
-        {
-            //TODO: Log this
-            abort(400);
+        $st = DB::connection('store');
+        $p = $st->getTablePrefix();
+        $ids = $st->table('users_items')->where('user_id', $user->id)->where('item_id', $item->id)
+            ->orderBy(DB::raw('(SELECT COUNT(*) FROM ' . $p . 'users_items_loadouts WHERE ' . $p . 'users_items_loadouts.useritem_id = ' . $p . 'users_items.id)'))
+            ->orderBy('id', 'desc')
+            ->pluck('id')->all();
+        if (empty($ids)) {
+            return redirect()->route('userpanel.useritems.index')->withErrors(["Tu ne possèdes pas cet objet."]);
         }
+        if (!$all) $ids = array_slice($ids, 0, 1);
 
-        //Check if item is refundable or not
-        if ($item->is_refundable == 0)
-        {
-            $user->items()->detach($item->id); //Remove item
-            if($single_item == true)
-            {
-                //TODO: Find a way to replace the for loop
-                for ($i = 1 ; $i <= $owned_items - 1; $i++) //Reattach items again
-                {
-                    $user->items()->attach($item->id);
-                }
+        $refundEach = $item->is_refundable == 1 ? (int) floor($item->price * (float) \Config::get('userpanel.items_refundfee')) : 0;
+        $removed = 0;
+        foreach ($ids as $id) {
+            // Supprime l'exemplaire seulement s'il appartient toujours au joueur (une requête atomique).
+            if ($st->table('users_items')->where('id', $id)->where('user_id', $user->id)->delete() == 1) {
+                $st->table('users_items_loadouts')->where('useritem_id', $id)->delete();
+                $removed++;
             }
-
-            return redirect()->route('userpanel.useritems.index');
         }
-        elseif ($item->is_refundable == 1) //Check if credits should be awarded
-        {
-            $refundfee = \Config::get('userpanel.items_refundfee');
-
-            if($single_item == true) //Check if only a single item should be removed
-            {
-                //TODO: Find a way to replace the for loop
-                $user->items()->detach($item->id); //Remove items
-                for ($i = 1 ; $i <= $owned_items - 1; $i++) //Reattach all but one item again
-                {
-                    $user->items()->attach($item->id);
-                }
-
-                $user->credits = $user->credits + $item->price * $refundfee; //Return the Credits
-                $user->save(); //Save Credts
-            }
-            else //All items should be removed
-            {
-                $user->items()->detach($item->id);
-                $user->credits = $user->credits + $item->price * $owned_items * $refundfee; //Return the Credits
-                $user->save();
-            }
-
-            return redirect()->route('userpanel.useritems.index');
-        }
-        else
-        {
-            abort(500, "Invalid refundable string");
+        if ($removed > 0 && $refundEach > 0) {
+            $st->table('users')->where('id', $user->id)->increment('credits', $refundEach * $removed);
         }
 
+        Log::info('[userpanel] vente', ['user' => $user->id, 'item' => $item->name, 'nb' => $removed, 'refund' => $refundEach * $removed]);
+        $msg = $refundEach > 0
+            ? "Vendu : {$removed} × {$item->display_name} (+" . ($refundEach * $removed) . " crédits)"
+            : "Jeté : {$removed} × {$item->display_name}";
+        return redirect()->route('userpanel.useritems.index')->with('message', $msg);
     }
-
-    /**
-     * Returns the Datatables data
-     * Get the Useritems for the user
-     *
-     * @param $request
-     * @return mixed
-     */
-    public function getUserData(Request $request)
-    {
-        $user = StoreUser::find($request->session()->get('store_user_id'));
-
-        $useritems = $user->items();
-
-        return Datatables::of($useritems)
-            ->addColumn('action', function ($item) {
-                $actions = view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems._sellactions', compact('item'))->render();
-                return $actions;
-            })
-            ->make(true);
-    }
-
-    /**
-     * Returns the Datatables data
-     * Get all Items that are available for purchase
-     *
-     * @return mixed
-     */
-    public function getItemData(Request $request)
-    {
-        $items = StoreItem::where("is_buyable","1")->with('category');
-
-        return Datatables::of($items)
-            ->addColumn('action', function ($item) {
-                $actions = view('templates.' . \Config::get('userpanel.template') . 'userpanel.useritems._buyactions', compact('item'))->render();
-                return $actions;
-            })
-            ->make(true);
-    }
-
 }

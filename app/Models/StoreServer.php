@@ -1,5 +1,4 @@
-<?php namespace App\Models;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,22 +15,30 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Les serveurs sont rangés dans la base du PANNEAU (webpanel_servers) :
+// le Store 1.2 n'a pas de table servers. L'id = le numéro de serveur de la config du Store.
 
+namespace App\Models;
+
+use DB;
 use Illuminate\Database\Eloquent\Model;
 
-class StoreServer extends Model {
-
-    protected $connection = 'store';
+class StoreServer extends Model
+{
+    protected $connection = 'webpanel';
     protected $table = 'servers';
-    protected $fillable = ['name','display_name', 'ip', 'port'];
+    public $incrementing = false;
+    protected $fillable = ['id', 'name', 'display_name', 'ip', 'port'];
 
-    public function items()
+    protected static function boot()
     {
-        return $this->belongsToMany('App\Models\StoreItem','servers_categories', 'server_id', 'item_id')->withTimestamps();
-    }
+        parent::boot();
 
-    public function categories()
-    {
-        return $this->belongsToMany('App\Models\StoreCategory','servers_categories', 'server_id', 'category_id')->withTimestamps();
+        // Retire les restrictions qui visent ce serveur dans la base du store.
+        static::deleting(function (StoreServer $server) {
+            DB::connection('store')->table('servers_items')->where('server_id', $server->id)->delete();
+            DB::connection('store')->table('servers_categories')->where('server_id', $server->id)->delete();
+        });
     }
 }

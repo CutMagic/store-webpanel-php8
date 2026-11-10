@@ -20,7 +20,7 @@
 use App\Models\StoreItem;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Yajra\Datatables\Datatables;
+use Yajra\DataTables\Facades\DataTables as Datatables;
 
 class ItemsController extends Controller
 {
@@ -82,7 +82,7 @@ class ItemsController extends Controller
      */
     public function edit($item)
     {
-        $current_servers = array_pluck($item->servers()->get(['servers.id'])->toArray(),'id');
+        $current_servers = $item->getServerIds(); // [multimod] serveurs dans la base du panneau
         return view('templates.' . \Config::get('webpanel.template') . 'webpanel.store.items.edit', compact('item','current_servers'));
     }
 
@@ -124,7 +124,7 @@ class ItemsController extends Controller
     private function SyncServers(StoreItem $item, $servers = array())
     {
         if ($servers == null) $servers = array();
-        $item->servers()->sync($servers);
+        $item->syncServers($servers); // [multimod]
     }
 
 
@@ -135,6 +135,7 @@ class ItemsController extends Controller
      */
     public function getData()
     {
+        $this->onlyColumns(['id', 'priority', 'name', 'type', 'price', 'action']); // [multimod] colonnes autorisées uniquement
         $items = StoreItem::select(['id','priority','name','type','price']);
 
         return Datatables::of($items)
@@ -142,7 +143,7 @@ class ItemsController extends Controller
                 $actions = view('templates.' . \Config::get('webpanel.template') . 'webpanel.store.items._actions', compact('item'))->render();
                 return $actions;
             })
-            ->make();
+            ->rawColumns(['action'])->make(true); // [php82] colonnes par nom ; tout est échappé sauf action
     }
 
 }

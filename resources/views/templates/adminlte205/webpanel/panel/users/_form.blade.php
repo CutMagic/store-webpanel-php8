@@ -37,7 +37,8 @@
                 </div>
                 <div class="form-group">
                     {!! Form::label('password', 'Password') !!}
-                    {!! Form::text('password', null, ['class' => 'form-control']) !!} <!-- TODO: Change this to a password field -->
+                    {!! Form::password('password', ['class' => 'form-control', 'autocomplete' => 'new-password']) !!}
+                    <p class="help-block">8 caractères minimum. En modification : laisser vide pour garder le mot de passe actuel.</p> {{-- [multimod] avant : champ texte pré-rempli avec le hachage --}}
                 </div>
                 <div class="box-footer">
                     {!! Form::submit($SubmitButtonText, ['class' => 'btn btn-primary']) !!}

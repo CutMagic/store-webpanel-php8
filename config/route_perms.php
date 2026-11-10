@@ -80,6 +80,7 @@ return [
             'versions' => [
                 'index'      => 'WebPanelStoreVersionsView',
                 'show'       => 'WebPanelStoreVersionsView',
+                'update'     => 'WebPanelStoreVersionsView', // [multimod] manquait : ouvert à tout compte admin
             ],
 
             //Permissions for the WebPanel Store Tools
@@ -88,7 +89,8 @@ return [
                 'json_shrinker' => 'WebPanelStoreToolsJsonShrinker',
                 'json_checker'  => 'WebPanelStoreToolsJsonChecker',
                 'import'        => 'WebPanelStoreToolsImport',
-                'edport'        => 'WebPanelStoreToolsExport',
+                'do_import'     => 'WebPanelStoreToolsImport', // [multimod] manquait : n'importe quel admin pouvait importer
+                'export'        => 'WebPanelStoreToolsExport', // [multimod] faute de frappe d'origine "edport"
 
             ],
         ],

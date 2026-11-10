@@ -14,29 +14,16 @@
 
 {{--You should have received a copy of the GNU Affero General Public License--}}
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
+{{-- [multimod] menu de l'espace joueur pour le Store 1.2 --}}
 <aside class="main-sidebar">
-    <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
         <ul class="sidebar-menu">
-            <li class="header">MAIN NAVIGATION</li>
-            <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-
-            <li><a href="{{URL::route('userpanel.useritems.index')}}"><i class="fa fa-dashboard"></i> Your Items</a></li> <!-- TODO: FIX Icon -->
-            <li><a href="{{URL::route('userpanel.useritems.buyoverview')}}"><i class="fa fa-dashboard"></i> Buy new Items</a></li> <!-- TODO: FIX Icon -->
-
-            <!-- Loadouts -->
-            <li class="treeview">
-                <a href="#">
-                    <i class="fa fa-files-o"></i>
-                    <span>Loadouts</span>
-                    <span class="label label-primary pull-right">123</span>
-                </a>
-                <ul class="treeview-menu">
-                    <li><a href="{{URL::route('userpanel.loadouts.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                    <li><a href="{{URL::route('userpanel.loadouts.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
-                </ul>
-            </li>
+            <li class="header">MON STORE</li>
+            <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> <span>Tableau de bord</span></a></li>
+            <li><a href="{{URL::route('userpanel.useritems.index')}}"><i class="fa fa-cubes"></i> <span>Mes objets</span></a></li>
+            <li><a href="{{URL::route('userpanel.useritems.buyoverview')}}"><i class="fa fa-shopping-cart"></i> <span>Boutique</span></a></li>
+            <li><a href="{{URL::route('userpanel.loadouts.index')}}"><i class="fa fa-check-square-o"></i> <span>Objets équipés</span></a></li>
+            <li><a href="{{URL::route('userpanel.auth.logout')}}"><i class="fa fa-sign-out"></i> <span>Déconnexion</span></a></li>
         </ul>
     </section>
-    <!-- /.sidebar -->
 </aside>

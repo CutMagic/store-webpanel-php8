@@ -1,5 +1,4 @@
-<?php namespace App\Http\Controllers;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,19 +15,26 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [php82] Installateur porté pour Laravel 12 : clé "base64:", noms de réglages Laravel 12,
+// valeurs entre guillemets dans le .env (un mot de passe avec # ou espace reste correct),
+// "migrate --force" (obligatoire en production). Ne crée que les tables webpanel_* du panneau.
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Symfony\Component\Console\Output\StreamOutput;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 
 class InstallerController extends Controller
 {
-
     public function showWelcome()
     {
         return view('templates.installer.welcome');
+    }
+
+    public function postWelcome()
+    {
+        return redirect()->route('installer.settings.show');
     }
 
     public function showSettings()
@@ -38,52 +44,51 @@ class InstallerController extends Controller
 
     public function postSettings(Request $request)
     {
-        $settings = array();
+        [$hostPanel, $portPanel] = $this->hostPort($request->input('db_host_panel'));
+        [$hostStore, $portStore] = $this->hostPort($request->input('db_host_store'));
 
-        $settings["APP_ENV"] = "local";
-        $settings["APP_DEBUG"] = "true";
-        $settings["APP_KEY"] = "";
-        $settings["APP_URL"] = "";
+        $settings = [
+            'APP_NAME' => 'Store',
+            'APP_ENV' => 'production',
+            'APP_DEBUG' => 'false',
+            'APP_KEY' => 'base64:' . base64_encode(random_bytes(32)),
+            'APP_URL' => $request->getSchemeAndHttpHost() . $request->getBasePath(),
+            'APP_LOCALE' => 'fr',
 
-        $settings["DB_HOST_PANEL"] = $request->input("db_host_panel");
-        $settings["DB_DATABASE_PANEL"] = $request->input("db_database_panel");
-        $settings["DB_USERNAME_PANEL"] = $request->input("db_username_panel");
-        $settings["DB_PASSWORD_PANEL"] = $request->input("db_password_panel");
-        $settings["DB_PREFIX_PANEL"] = $request->input("db_prefix_panel");
+            'DB_CONNECTION' => 'webpanel',
+            'DB_HOST_PANEL' => $hostPanel,
+            'DB_PORT_PANEL' => $portPanel,
+            'DB_DATABASE_PANEL' => $request->input('db_database_panel'),
+            'DB_USERNAME_PANEL' => $request->input('db_username_panel'),
+            'DB_PASSWORD_PANEL' => $request->input('db_password_panel'),
+            'DB_PREFIX_PANEL' => $request->input('db_prefix_panel', 'webpanel_'),
 
-        $settings["DB_HOST_STORE"] = $request->input("db_host_store");
-        $settings["DB_DATABASE_STORE"] = $request->input("db_database_store");
-        $settings["DB_USERNAME_STORE"] = $request->input("db_username_store");
-        $settings["DB_PASSWORD_STORE"] = $request->input("db_password_store");
-        $settings["DB_PREFIX_STORE"] = $request->input("db_prefix_store");
+            'DB_HOST_STORE' => $hostStore,
+            'DB_PORT_STORE' => $portStore,
+            'DB_DATABASE_STORE' => $request->input('db_database_store'),
+            'DB_USERNAME_STORE' => $request->input('db_username_store'),
+            'DB_PASSWORD_STORE' => $request->input('db_password_store'),
+            'DB_PREFIX_STORE' => $request->input('db_prefix_store', 'store_'),
 
-        $settings["CACHE_DRIVER"] = $request->input("cache_driver");
-        $settings["SESSION_DRIVER"] = $request->input("session_driver");
-        $settings["QUEUE_DRIVER"] = $request->input("queue_driver");
+            'CACHE_STORE' => $request->input('cache_driver') ?: 'file',
+            'SESSION_DRIVER' => $request->input('session_driver') ?: 'file',
+            'QUEUE_CONNECTION' => $request->input('queue_driver') ?: 'sync',
+            'LOG_CHANNEL' => 'daily',
 
-        $settings["MAIL_DRIVER"] = $request->input("mail_driver");
-        $settings["MAIL_HOST"] = $request->input("mail_host");
-        $settings["MAIL_PORT"] = $request->input("mail_port");
-        $settings["MAIL_USERNAME"] = $request->input("mail_username");
-        $settings["MAIL_PASSWORD"] = $request->input("mail_password");
-        $settings["MAIL_FROM_ADR"] = $request->input("mail_from_adr");
-        $settings["MAIL_FROM_NAME"] = $request->input("mail_from_name");
+            'MAIL_MAILER' => $request->input('mail_driver') ?: 'log',
+            'MAIL_HOST' => $request->input('mail_host'),
+            'MAIL_PORT' => $request->input('mail_port'),
+            'MAIL_USERNAME' => $request->input('mail_username'),
+            'MAIL_PASSWORD' => $request->input('mail_password'),
+            'MAIL_FROM_ADDRESS' => $request->input('mail_from_adr'),
+            'MAIL_FROM_NAME' => $request->input('mail_from_name') ?: 'Store',
 
-        $settings["UP_SERVERLOGIN_IGNORE_IPMISMATCH"] = "true";
-        $settings["UP_ITEMS_REFUNDFEE"] = "0.8";
+            'UP_SERVERLOGIN_IGNORE_IPMISMATCH' => 'false',
+            'UP_ITEMS_REFUNDFEE' => '0.8',
+        ];
 
-        //Generate a new app key and add it to the config array
-        \Artisan::call('key:generate');
-        $output = \Artisan::output();
-        $start = strpos($output,"[");
-        $end = strpos($output,"]");
-        $key = substr($output,$start+1,$end-$start-1);
-        $settings["APP_KEY"] = $key;
-
-        //Write the settings to file
         $this->writeEnvFile($settings);
 
-        //Redirect to next page
         return redirect()->route('installer.fill_db.show');
     }
 
@@ -94,39 +99,38 @@ class InstallerController extends Controller
 
     public function postFillDb()
     {
-        //Migrate DB
-        \Artisan::call('migrate', array());
-        $output = \Artisan::output();
+        Artisan::call('migrate', ['--force' => true]);
+        $output = Artisan::output();
 
-        return view('templates.installer.fillresult',compact("output"));
+        return view('templates.installer.fillresult', compact('output'));
     }
 
     public function showFinish()
     {
-        //Write installed file
-        $instfile = fopen("../INSTALLED","w");
-        fwrite($instfile,"INSTALLED");
-        fclose($instfile);
+        file_put_contents(base_path('INSTALLED'), 'INSTALLED');
 
         return view('templates.installer.finish');
     }
 
-    /**
-     * @param $settings Settings to write to the Env File
-     */
-    private function writeEnvFile($settings)
+    /** "hote:port" ou "hote" -> [hote, port] */
+    private function hostPort($value)
     {
-        $envcontent = "";
-
-        foreach($settings as $setting=>$value)
-        {
-            $envcontent .= $setting."=".$value.PHP_EOL;
+        $value = trim((string) $value);
+        if (preg_match('/^(.+):(\d+)$/', $value, $m)) {
+            return [$m[1], $m[2]];
         }
-        //dd($envcontent);
+        return [$value === '' ? '127.0.0.1' : $value, '3306'];
+    }
 
-        $envfile = fopen("../.env","w");
-        fwrite($envfile, $envcontent);
-        fclose($envfile);
-
+    /** Écrit le .env ; chaque valeur est entre guillemets (\, " et $ échappés). */
+    private function writeEnvFile(array $settings)
+    {
+        $content = '';
+        foreach ($settings as $key => $value) {
+            $value = str_replace(["\r", "\n", "\0"], '', (string) $value); // pas de nouvelle ligne injectée dans le .env
+            $escaped = str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value);
+            $content .= $key . '="' . $escaped . '"' . PHP_EOL;
+        }
+        file_put_contents(base_path('.env'), $content);
     }
 }

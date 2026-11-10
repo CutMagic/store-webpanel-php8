@@ -109,42 +109,28 @@
                         <span class="label label-warning">{{$credits}}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">User Status</li>
+                        <li class="header">Mon compte</li>
                         <li>
                             <!-- inner menu: contains the actual data TODO: Add proper Icons-->
                             <ul class="menu">
                                 <li>
                                     <a href="#">
-                                        <i class="fa fa-users text-aqua"></i> You have {{$credits}} Credits
+                                        <i class="fa fa-users text-aqua"></i> Tu as {{$credits}} crédits
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <i class="fa fa-warning text-yellow"></i> You have {{$owned_item_count}} Items
+                                        <i class="fa fa-warning text-yellow"></i> Tu as {{$owned_item_count}} objet(s)
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-warning text-yellow"></i> You own {{$owned_loadout_count}} Loadouts
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-warning text-yellow"></i> You are subscribed to {{$subscribed_loadout_count}} Loadouts
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        @if($equipped_loadout_name != NULL)
-                                        <i class="fa fa-users text-yellow"></i> You have selected the loadout {{$equipped_loadout_name}}
-                                        @else
-                                        <i class="fa fa-users text-yellow"></i> You have not equipped a loadout
-                                        @endif
+                                    <a href="{{URL::route('userpanel.loadouts.index')}}">
+                                        <i class="fa fa-check text-green"></i> {{$equipped_count}} objet(s) équipé(s)
                                     </a>
                                 </li>
                             </ul>
                         </li>
-                        <li class="footer"><a href="{{URL::route('userpanel.dashboard')}}">View all</a></li>
+                        <li class="footer"><a href="{{URL::route('userpanel.dashboard')}}">Tableau de bord</a></li>
                     </ul>
                 </li>
                 <!-- Tasks: style can be found in dropdown.less -->
@@ -154,7 +140,7 @@
                         <span class="label label-danger">5</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">5 Most Recent Purchases</li>
+                        <li class="header">Derniers objets reçus</li>
                         <li>
                             <!-- inner menu: contains the actual data -->
                             <ul class="menu">
@@ -162,7 +148,7 @@
                                 <li><!-- Task item -->
                                     <a href="#">
                                         <h3>
-                                            {{$item->name}}
+                                            {{$item->display_name}}
                                             <!--<small class="pull-right">20%</small>-->
                                         </h3>
                                     </a>
@@ -171,7 +157,7 @@
                             </ul>
                         </li>
                         <li class="footer">
-                            <a href="{{ URL::route("userpanel.useritems.index") }}">View all Items</a>
+                            <a href="{{ URL::route("userpanel.useritems.index") }}">Voir tous mes objets</a>
                         </li>
                     </ul>
                 </li>
@@ -187,7 +173,7 @@
                             <img src="{{URL::route("userpanel.steamimage.current") }}" class="img-circle" alt="User Image" />
                             <p>
                                 {{$username}}
-                                <small>Member since quite some time</small><!-- FIXME: Add the actual date here-->
+                                <small>{{$credits}} crédits</small>
                             </p>
                         </li>
                         <!-- Menu Body -->

@@ -55,8 +55,9 @@
                 </div>
             </form>
 
-            <a href="{{ url('/password/email') }}">I forgot my password</a><br>
-            <a href="{{ url('/auth/register') }}" class="text-center">Register a new membership</a>
+            {{-- [php82] mot de passe oublié : lien à usage unique envoyé par mail (Auth\PasswordResetController) --}}
+            <a href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+            {{-- [multimod] inscription libre fermée --}}
 
         </div><!-- /.login-box-body -->
     </div><!-- /.login-box -->

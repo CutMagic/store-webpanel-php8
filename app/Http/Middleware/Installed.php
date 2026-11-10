@@ -15,7 +15,7 @@ class Installed
      */
     public function handle($request, Closure $next)
     {
-        if(!file_exists("../INSTALLED"))
+        if(!file_exists(base_path("INSTALLED")) /* [multimod] chemin absolu */)
         {
             abort(403,'Application not installed');
             die();

@@ -1,5 +1,4 @@
-<?php namespace App\Models;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,33 +15,42 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Adapté au schéma du Store 1.2 (store_users : id, auth, name, credits).
+
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StoreUser extends Model
 {
+    use CleansUtf8; // [multimod] textes coupés par le plugin
+
     protected $connection = 'store';
     protected $table = 'users';
+    public $timestamps = false;
     protected $fillable = ['auth', 'name', 'credits'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (StoreUser $user) {
+            foreach ($user->userItems()->get() as $userItem) {
+                $userItem->delete();
+            }
+        });
+    }
+
+    /** Exemplaires possédés (une ligne par exemplaire). */
+    public function userItems()
+    {
+        return $this->hasMany('App\Models\StoreUserItem', 'user_id', 'id');
+    }
 
     public function items()
     {
-        return $this->belongsToMany('App\Models\StoreItem','users_items', 'user_id', 'item_id')->withTimestamps();
-    }
-
-    public function owned_loadouts()
-    {
-        return $this->hasMany('App\Models\StoreLoadout','owner_id','id');
-    }
-
-    public function subscribed_loadouts()
-    {
-        return $this->belongsToMany('App\Models\StoreLoadout','users_loadouts', 'user_id', 'loadout_id')->withTimestamps();
-    }
-
-    public function equipped_loadout()
-    {
-        return $this->belongsTo('App\Models\StoreLoadout','eqp_loadout_id','id');
+        return $this->belongsToMany('App\Models\StoreItem', 'users_items', 'user_id', 'item_id')
+            ->withPivot('id', 'acquire_date', 'acquire_method');
     }
 }

@@ -42,7 +42,8 @@ class PanelUserRequest extends Request
         return [
             'name' => 'required',
             'email' => 'required|email',
-            'password' => 'required'
+            // [multimod] obligatoire à la création, facultatif en modification (vide = inchangé)
+            'password' => ($this->isMethod('post') ? 'required' : 'nullable') . '|min:8'
         ];
     }
 

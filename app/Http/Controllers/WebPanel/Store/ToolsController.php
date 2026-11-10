@@ -72,11 +72,11 @@ class ToolsController extends Controller
 
         // **Perform some validation**
         //Check if the file is valid
-        if (Input::file('import')->isValid()) {
+        if (request()->file('import')->isValid()) {
             $json_string = File::get($file);
             $json_object = json_decode($json_string);
 
-            $extension = Input::file('import')->getClientOriginalExtension();
+            $extension = 'json'; // [multimod] toujours .json (l'extension envoyée par le navigateur n'est pas fiable)
             $fileName = $this->getUploadString($extension);
 
             Storage::put('uploads/' . $fileName, $json_string);
@@ -122,7 +122,13 @@ class ToolsController extends Controller
 
     public function PerformImport(Requests\ImportRequest $request)
     {
-        $json_string = Storage::get('uploads/' . $request->input('fileName'));
+        // [multimod] le nom doit être celui généré par l'upload (6 chiffres + .json) : sinon "../" permettrait
+        // de lire / supprimer n'importe quel fichier du site
+        $fileName = basename((string) $request->input('fileName'));
+        if (!preg_match('/^\d{6}\.json$/', $fileName) || !Storage::exists('uploads/' . $fileName)) {
+            abort(400, "Fichier d'import invalide");
+        }
+        $json_string = Storage::get('uploads/' . $fileName);
 
         $json_object = json_decode($json_string);
 
@@ -157,7 +163,7 @@ class ToolsController extends Controller
             }
         }
 
-        Storage::delete('uploads/' . $request->input('fileName'));
+        Storage::delete('uploads/' . $fileName);
 
 
         return redirect()->route('webpanel.store.tools.index');

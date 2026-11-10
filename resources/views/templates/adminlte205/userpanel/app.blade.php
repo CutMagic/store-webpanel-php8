@@ -18,7 +18,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>WP2 User | @yield('title')</title>
+    <title>Store | @yield('title')</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.2 -->
     <link href="{{asset('templates/adminlte205/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
@@ -71,6 +71,10 @@
         <!-- Main content -->
         <section class="content">
             @include('templates.adminlte205.includes.errorcallout')
+            {{-- [multimod] message de réussite (achat, vente, équipement) --}}
+            @if (Session::has('message'))
+                <div class="alert alert-success">{{ Session::get('message') }}</div>
+            @endif
 
             @yield('content')
         </section><!-- /.content -->

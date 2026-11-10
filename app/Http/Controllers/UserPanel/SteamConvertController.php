@@ -35,35 +35,21 @@ class SteamConvertController extends Controller
         $halfAID = (int) $toks[2];
         return ($halfAID * 2) + $odd;
     }
+    // [php82] calculs en entiers 64 bits : plus besoin de l'extension bcmath
     public static function steamid_to_community($steamid)
     {
         if (substr_count($steamid, ":") != 2)
             return 0;
         $parts = explode(':', str_replace('STEAM_', '', $steamid));
-        $result = bcadd(bcadd('76561197960265728', $parts['1']), bcmul($parts['2'], '2'));
-        $remove = strpos($result, ".");
-        if ($remove != false)
-        {
-            $result = substr($result, 0, strpos($result, "."));
-        }
-        return $result;
+        return (string) (76561197960265728 + (int) $parts[1] + 2 * (int) $parts[2]);
     }
+
     public static function communityid_to_steam($i64friendID)
     {
-        $tmpfriendID = $i64friendID;
-        $iServer = "1";
-        if (bcmod($i64friendID, "2") == "0")
-        {
-            $iServer = "0";
-        }
-        $tmpfriendID = bcsub($tmpfriendID, $iServer);
-        if (bccomp("76561197960265728", $tmpfriendID) == -1)
-        {
-            $tmpfriendID = bcsub($tmpfriendID, "76561197960265728");
-        }
-        $tmpfriendID = bcdiv($tmpfriendID, "2");
-        return ("STEAM_0:" . $iServer . ":" . $tmpfriendID);
+        $acc = (int) $i64friendID - 76561197960265728;
+        return "STEAM_0:" . ($acc % 2) . ":" . intdiv($acc, 2);
     }
+
     public static function auth_to_steamid($authid)
     {
         $steam = array();
@@ -77,7 +63,7 @@ class SteamConvertController extends Controller
             $steam[1] = 1;
             $authid -= 1;
         }
-        $steam[2] = $authid / 2;
+        $steam[2] = intdiv($authid, 2); // [php82]
         return $steam[0] . ":" . $steam[1] . ":" . $steam[2];
     }
 }

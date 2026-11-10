@@ -1,5 +1,4 @@
 <?php
-
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,310 +15,95 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Réécrit pour le Store 1.2 : les loadouts sont communs (store_loadouts) et chaque joueur
+// y équipe ses exemplaires (store_users_items_loadouts). Même règle que le plugin (store-backend) :
+// équiper un objet déséquipe d'abord, dans ce loadout, les objets du même loadout_slot.
+// Les changements faits ici sont pris en compte en jeu à la prochaine apparition du joueur.
 
 namespace App\Http\Controllers\UserPanel;
 
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Models\StoreLoadout;
 use App\Models\StoreUser;
 use App\Models\StoreItem;
-use Yajra\Datatables\Datatables;
-use Carbon\Carbon;
-use Session;
-
-//TODO: Add Logging
+use App\Models\StoreLoadout;
+use DB;
+use App\Support\Utf8;
 
 class LoadoutController extends Controller
 {
-    /**
-     * Overview of all the loadouts
-     * Display tags for the loadouts (owned, subscribed)
-     * Display a subscribe button (and maybe a clone button)
-     */
-    public function getIndex()
+    private function currentUser(Request $request)
     {
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts.index');
+        return StoreUser::findOrFail($request->session()->get('store_user_id'));
     }
 
-    /**
-     * Page to create a new loadout
-     *
-     * Displays the page to create a new loadout
-     */
-    public function getCreate()
+    /** Liste des loadouts, avec ce que le joueur y a équipé et ce qu'il peut y équiper. */
+    public function getIndex(Request $request)
     {
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts.create',compact('user_id'));
+        $user = $this->currentUser($request);
+        $st = DB::connection('store');
+        $loadouts = StoreLoadout::orderBy('id')->get();
+
+        // Objets possédés (un par objet) avec emplacement.
+        // [multimod] sans GROUP BY sur des colonnes non agrégées (ONLY_FULL_GROUP_BY)
+        $ownedIds = $st->table('users_items')->where('user_id', $user->id)->distinct()->pluck('item_id')->all();
+        $owned = empty($ownedIds) ? [] : StoreItem::whereIn('id', $ownedIds)
+            ->whereNotNull('loadout_slot')->where('loadout_slot', '<>', '')
+            ->orderBy('loadout_slot')->orderBy('display_name')
+            ->get(['id', 'display_name', 'type', 'loadout_slot'])->all();
+
+        // Ce qui est équipé : [loadout_id][item_id] = true
+        $rows = $st->table('users_items_loadouts')
+            ->join('users_items', 'users_items.id', '=', 'users_items_loadouts.useritem_id')
+            ->where('users_items.user_id', $user->id)
+            ->get(['users_items_loadouts.loadout_id', 'users_items.item_id']);
+        $equipped = [];
+        foreach ($rows as $r) $equipped[$r->loadout_id][$r->item_id] = true;
+
+        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts.index', compact('loadouts', 'owned', 'equipped', 'user'));
     }
 
-    /**
-     * Creates the new loadout
-     *
-     * This page allows the user to create a new loadout
-     * Once the loadout is created the user is redirected to the new loadout
-     */
-    public function postCreate(Requests\StoreLoadoutRequest $request)
+    public function postEquip(Request $request, $loadout, $item_id)
     {
-        $input = $request->all();
-        $loadout = StoreLoadout::create($input);
+        $user = $this->currentUser($request);
+        $item = StoreItem::findOrFail($item_id);
+        $st = DB::connection('store');
 
-        return redirect()->route('userpanel.loadouts.edit',$loadout->id);
-    }
-
-    /**
-     * Details for the Loadout
-     * Displays the associted items
-     * Displays a owned tag if a item is owned
-     *
-     * @param $loadoutid
-     */
-    public function getLoadout($loadout)
-    {
-        $items = $loadout->with("items")->find($loadout->id)->toArray()['items'];
-        return view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts.view',compact('loadout','items'));
-    }
-
-    /**
-     * Displays the Edit Loadout Page
-     *
-     * @param $loadoutid
-     * @return \BladeView|bool|\Illuminate\View\View
-     */
-    public function getLoadoutEdit($loadout)
-    {
-        $items = $loadout->with("items")->find($loadout->id)->toArray()['items'];
-        if ($loadout->owner_id == Session::get('store_user_id',0))
-        {
-            return view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts.edit',compact('loadout','items'));
+        $useritem = $st->table('users_items')->where('user_id', $user->id)->where('item_id', $item->id)->orderBy('id')->first();
+        if ($useritem == null) {
+            return redirect()->route('userpanel.loadouts.index')->withErrors(["Tu ne possèdes pas cet objet."]);
         }
-        else
-        {
-            abort(401);
+
+        $this->unequipSlot($user->id, $loadout->id, $item->loadout_slot);
+        $st->table('users_items_loadouts')->insert(['loadout_id' => $loadout->id, 'useritem_id' => $useritem->id]);
+
+        return redirect()->route('userpanel.loadouts.index')->with('message', $item->display_name . ' équipé dans « ' . $loadout->display_name . ' ».');
+    }
+
+    public function postUnequip(Request $request, $loadout, $item_id)
+    {
+        $user = $this->currentUser($request);
+        $item = StoreItem::findOrFail($item_id);
+        $st = DB::connection('store');
+
+        $ids = $st->table('users_items')->where('user_id', $user->id)->where('item_id', $item->id)->pluck('id')->all();
+        if (!empty($ids)) {
+            $st->table('users_items_loadouts')->where('loadout_id', $loadout->id)->whereIn('useritem_id', $ids)->delete();
         }
+
+        return redirect()->route('userpanel.loadouts.index')->with('message', $item->display_name . ' retiré de « ' . $loadout->display_name . ' ».');
     }
 
-    /**
-     * Saves the Edited Loadout
-     *
-     * @param $loadoutid
-     * @param Request $request
-     */
-    public function postLoadoutEdit($loadout, Requests\StoreLoadoutRequest $request)
+    /** Déséquipe, pour ce joueur et ce loadout, tous les objets d'un emplacement. */
+    private function unequipSlot($userId, $loadoutId, $slot)
     {
-        if ($loadout->owner_id == Session::get('store_user_id',0))
-        {
-            $loadout->update($request->all());
-            return redirect()->route('userpanel.loadouts.view',$loadout->id);
+        $st = DB::connection('store');
+        $ids = $st->table('users_items')->join('items', 'items.id', '=', 'users_items.item_id')
+            ->where('users_items.user_id', $userId)->where('items.loadout_slot', $slot)
+            ->pluck('users_items.id')->all();
+        if (!empty($ids)) {
+            $st->table('users_items_loadouts')->where('loadout_id', $loadoutId)->whereIn('useritem_id', $ids)->delete();
         }
-        else
-        {
-            abort(401);
-        }
-    }
-
-    /**
-     * Deletes the Loadout
-     *
-     * @param $loadoutid
-     * @param Request $request
-     */
-    public function getDelete($loadout, Request $request)
-    {
-        if ($loadout->owner_id == Session::get('store_user_id',0))
-        {
-            $loadout->delete();
-            return redirect()->route('userpanel.loadouts.index');
-        }
-        else
-        {
-            abort(401);
-        }
-    }
-
-    /**
-     * Shows the page to add items to a loadout
-     *
-     * @param $loadout
-     * @param Request $request
-     */
-    public function getLoadoutItems($loadout, Request $request)
-    {
-        if ($loadout->owner_id == Session::get('store_user_id',0))
-        {
-            return view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts.loadoutadditems',compact("loadout"));
-        }
-        else
-        {
-            abort(401);
-        }
-    }
-
-    /**
-     * Adds the item to the loadout
-     *
-     * @param $loadout
-     * @param $item_id
-     * @param Request $request
-     */
-    public function postLoadoutItemsAdd($loadout, $item_id, Request $request)
-    {
-        //TODO: Add logging
-        //Check if a item with that type is already added
-        //Then redirect to the loadout edit page
-        if ($loadout->owner_id == Session::get('store_user_id',0)) //Check if the User is the Owner of the loadout
-        {
-            $loadout_types = $loadout->items()->lists("loadout_slot")->toArray(); //Get the item types that are currently added to the loadout
-
-            $item = StoreItem::findOrFail($item_id); //Get the item the user wants to add to the loadout
-
-            //Check if the itemtype is not in the list of the currently added items
-            if(in_array($item->loadout_slot, $loadout_types))
-            {
-                //redirect user to loadout edit page with error message
-                return redirect()->route("userpanel.loadouts.edit",["loadout" => $loadout->id])
-                    ->with("flash_notification",array("message"=>"The item can not be added to the loadout because a item with the same loadout slot is already assigned to that loadout", "level"=>"error"));
-            }
-
-            //attach item to loadout
-            $loadout->items()->attach($item->id);
-
-            //redirect back to loadout edit page with success message
-            return redirect()->route("userpanel.loadouts.edit",["loadout" => $loadout->id])
-                ->with("flash_notification",array("message"=>"The item has successfully been added to the loadout", "level"=>"success"));
-        }
-        else
-        {
-            abort(401);
-        }
-    }
-
-    /**
-     * Removes the item from the loadout
-     *
-     * @param $loadout
-     * @param Request $request
-     */
-    public function postLoadoutItemsRemove($loadout, $item_id, Request $request)
-    {
-        //TODO: Add logging
-        //Remvoe the item from the loadout
-        //Then redirect to the loadout edit page
-        if ($loadout->owner_id == Session::get('store_user_id',0)) //Check if the User is the Owner of the loadout
-        {
-            $item = StoreItem::findOrFail($item_id); //Get the item the user wants to add to the loadout
-
-            //attach item to loadout
-            $loadout->items()->detach($item->id);
-
-            //redirect back to loadout edit page with success message
-            return redirect()->route("userpanel.loadouts.edit",["loadout" => $loadout->id])
-                ->with("flash_notification",array("message"=>"The item has successfully been removed from the loadout", "level"=>"success"));
-        }
-        else
-        {
-            abort(401);
-        }
-    }
-
-    /**
-     * Shows everyone who subscribed to the loadout
-     *
-     * @param $loadoutid
-     */
-    public function getLoadoutSubscribers($loadout)
-    {
-
-    }
-
-    /**
-     * Sets the loadout as primary loadout
-     *
-     * @param $loadout
-     */
-    public function postSelect($loadout)
-    {
-        $user = StoreUser::findOrFail(Session::get('store_user_id',0));
-        $user->eqp_loadout_id = $loadout->id;
-        $user->save();
-        //redirect back to loadout edit page with success message
-        return redirect()->route("userpanel.loadouts.view",["loadout" => $loadout->id])
-            ->with("flash_notification",array("message"=>"The selected loadout has been set as your equipped loadout", "level"=>"success"));
-    }
-
-    /**
-     * Subscribes a user to a loadout
-     */
-    public function getSubscribe($loadout)
-    {
-
-    }
-
-    /**
-     *
-     *
-     * @param $loadout
-     */
-    public function getClone ($loadout)
-    {
-
-    }
-
-
-    /**
-     * Datatable data for all Loadouts
-     *
-     */
-    public function getLoadoutData(Request $request)
-    {
-        $loadouts = StoreLoadout::with('owner')
-            ->where('privacy','public')
-            ->orWhere('privacy',NULL)
-            ->orWhere('owner_id',$request->session()->get('store_user_id'));
-
-        return Datatables::of($loadouts)
-            ->addColumn('action', function ($loadout) {
-                $actions = view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts._overviewactions', compact('loadout'))->render();
-                return $actions;
-            })
-            ->make(true);
-    }
-
-    /**
-     * Datatable data for items for a specific Loadout
-     *
-     * @param Store_Loadout $loadout
-     * @param Request $request
-     */
-    public function getItemDataForLoadout($loadout, Request $request)
-    {
-        //Only display items with a loadoutslot that has not jet been added to a loadout
-
-        //Get the types for the items that are currently associated with that loadout
-        $loadout_types = $loadout->items()->lists("loadout_slot");
-
-        $items = StoreItem::where("is_buyable","1")
-            ->whereNotIn('loadout_slot',$loadout_types)
-            ->with('category');
-
-        Session::flash("loadout_id",$loadout->id); //Dirty hack to get the loadout id into the table via the ViewComposerServiceProvider
-
-        return Datatables::of($items)
-            ->addColumn('action', function ($item) {
-                $actions = view('templates.' . \Config::get('userpanel.template') . 'userpanel.loadouts._additemactions', compact('item'))->render();
-                return $actions;
-            })
-            ->make(true);
-    }
-
-    /**
-     * Datatable data for subscribers for a specific loadout
-     *
-     * @param $loadout
-     */
-    public function getSubscriberDataForLoadout($loadout)
-    {
-
     }
 }

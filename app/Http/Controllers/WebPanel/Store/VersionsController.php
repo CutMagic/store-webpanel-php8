@@ -142,9 +142,16 @@ class VersionsController extends Controller
 
         $master_version = json_decode($master_version,true);
         //Download additional files
+        // [multimod] la liste vient d'un dépôt GitHub tiers : on n'accepte que des noms simples et des adresses
+        // raw.githubusercontent.com en https (sinon file://, adresses internes, ../ seraient possibles)
+        if (!is_array($master_version) || !isset($master_version['modules-links']) || !is_array($master_version['modules-links'])) return;
         foreach($master_version['modules-links'] as $module=>$version_link)
         {
-            Storage::put('/versions/'.$module.'.json',file_get_contents($version_link));
+            if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', (string) $module)) continue;
+            if (!is_string($version_link) || strpos($version_link, 'https://raw.githubusercontent.com/') !== 0) continue;
+            $data = @file_get_contents($version_link);
+            if ($data === false || json_decode($data) === null) continue;
+            Storage::put('/versions/'.$module.'.json', $data);
         }
     }
 

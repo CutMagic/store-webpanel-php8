@@ -20,7 +20,7 @@
 use App\Models\StoreCategory;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Yajra\Datatables\Datatables;
+use Yajra\DataTables\Facades\DataTables as Datatables;
 
 class CategoriesController extends Controller
 {
@@ -82,7 +82,7 @@ class CategoriesController extends Controller
      */
     public function edit($category)
     {
-        $current_servers = array_pluck($category->servers()->get(['servers.id'])->toArray(),'id');
+        $current_servers = $category->getServerIds(); // [multimod] serveurs dans la base du panneau
         return view('templates.' . \Config::get('webpanel.template') . 'webpanel.store.categories.edit', compact('category','current_servers'));
     }
 
@@ -124,7 +124,7 @@ class CategoriesController extends Controller
     private function SyncServers(StoreCategory $category, $servers = array())
     {
         if ($servers == null) $servers = array();
-        $category->servers()->sync($servers);
+        $category->syncServers($servers); // [multimod]
     }
 
 
@@ -135,6 +135,7 @@ class CategoriesController extends Controller
      */
     public function getData()
     {
+        $this->onlyColumns(['id', 'priority', 'display_name', 'require_plugin', 'action']); // [multimod] colonnes autorisées uniquement
         $categories = StoreCategory::select(['id','priority','display_name','require_plugin']);
 
         return Datatables::of($categories)
@@ -142,7 +143,7 @@ class CategoriesController extends Controller
                 $actions = view('templates.' . \Config::get('webpanel.template') . 'webpanel.store.categories._actions', compact('category'))->render();
                 return $actions;
             })
-            ->make();
+            ->rawColumns(['action'])->make(true); // [php82] colonnes par nom ; tout est échappé sauf action
     }
 
 }

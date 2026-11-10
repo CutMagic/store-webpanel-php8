@@ -1,5 +1,4 @@
-<?php namespace App\Models;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,28 +15,41 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Adapté au schéma du Store 1.2 (store_categories, sans dates ni clés étrangères).
+
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StoreCategory extends Model
 {
+    use RestrictedToServers, CleansUtf8;
+
     protected $connection = 'store';
     protected $table = 'categories';
+    public $timestamps = false;
     protected $fillable = ['priority', 'display_name', 'description', 'require_plugin', 'web_description', 'web_color', 'enable_server_restriction'];
+
+    protected $serverPivotTable = 'servers_categories';
+    protected $serverPivotKey = 'category_id';
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Le Store 1.2 n'a pas de ON DELETE CASCADE : on supprime nous-mêmes les objets de la catégorie
+        // (chaque objet supprime à son tour ses exemplaires possédés et équipés).
+        static::deleting(function (StoreCategory $category) {
+            foreach ($category->items()->get() as $item) {
+                $item->delete();
+            }
+            $category->deleteServerRestrictions();
+        });
+    }
 
     public function items()
     {
-        return $this->hasMany('App\Models\StoreItem','category_id','id');
-    }
-
-    public function servers()
-    {
-        return $this->belongsToMany('App\Models\StoreServer','servers_categories', 'category_id', 'server_id')->withTimestamps();
-    }
-
-    public function getServerListAttribute()
-    {
-        return $this->servers->lists('id');
+        return $this->hasMany('App\Models\StoreItem', 'category_id', 'id');
     }
 }

@@ -40,6 +40,7 @@ class StoreServerRequest extends Request
     public function rules()
     {
         return [
+            'id' => 'required|integer|min:0', // [multimod] server_id du Store
             'name' => 'required', //TODO: Check for no spaces
             'display_name' => 'required',
             'ip' => 'required', //TODO: Check for valid ip

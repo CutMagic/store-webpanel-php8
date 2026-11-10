@@ -29,6 +29,6 @@
 
 @section('content')
     {!! Form::open(['route' => 'webpanel.panel.permissions.store']) !!}
-        @include('templates.adminlte205.webpanel.panel.permissions.._form',['LeftMenuTitle'=>'Create a new Permission','SubmitButtonText' => 'Create Permissions'])
+        @include('templates.adminlte205.webpanel.panel.permissions._form',['LeftMenuTitle'=>'Create a new Permission','SubmitButtonText' => 'Create Permissions'])
     {!! Form::close() !!}
 @stop

@@ -1,113 +1,48 @@
-{{--Copyright (c) 2015 "Werner Maisl"--}}
-
-{{--This file is part of the Store Webpanel V2.--}}
-
-{{--The Store Webpanel V2 is free software: you can redistribute it and/or modify--}}
-{{--it under the terms of the GNU Affero General Public License as--}}
-{{--published by the Free Software Foundation, either version 3 of the--}}
-{{--License, or (at your option) any later version.--}}
-
-{{--This program is distributed in the hope that it will be useful,--}}
-{{--but WITHOUT ANY WARRANTY; without even the implied warranty of--}}
-{{--MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the--}}
-{{--GNU Affero General Public License for more details.--}}
-
-{{--You should have received a copy of the GNU Affero General Public License--}}
-{{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
+{{-- [multimod] Confirmation d'achat (Store 1.2) --}}
 @extends('templates.adminlte205.userpanel.app')
 
-@section('title', 'UserItems')
+@section('title', 'Acheter')
 
-@section('subtitle', 'Confirm Purchase')
+@section('subtitle', $item->display_name)
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Items</li>
-    <li class="active">Confirm Purchase</li>
+    <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> Accueil</a></li>
+    <li><a href="{{URL::route('userpanel.useritems.buyoverview')}}">Boutique</a></li>
+    <li class="active">Acheter</li>
 @stop
 
 @section('content')
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-8">
             <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">Confirm the Item Purchase</h3>
-                </div><!-- /.box-header -->
+                <div class="box-header"><h3 class="box-title">Confirmer l'achat</h3></div>
                 <div class="box-body no-padding">
                     <table class="table table-striped">
-                        <tr>
-                            <th>Attribute</th>
-                            <th>Value</th>
-                        </tr>
-                        <tr>
-                            <td>Item Name</td>
-                            <td>{{$item->display_name}}</td>
-                        </tr>
-                        <tr>
-                            <td>Description</td>
-                            @if($item->web_description != "" || $item->web_description != NULL)
-                                <td>{{$item->web_escription}}</td>
-                            @else
-                                <td>{{$item->description}}</td>
-                            @endif
-                        </tr>
-                        <tr>
-                            <td>Type</td>
-                            <td>{{$item->type}}</td>
-                        </tr>
-                        <tr>
-                            <td>Loadout Slot</td>
-                            <td>{{$item->loadout_slot}}</td>
-                        </tr>
-                        <tr>
-                            <td>Price</td>
-                            <td>{{$item->price}}</td>
-                        </tr>
-                        <tr>
-                            <td>Tags</td>
-                            <td>
-                                @if($item->is_tradeable == 1) <span class="badge bg-green">tradeable</span> @else <span class="badge bg-red">not tradeable</span> @endif
-                                @if($item->is_refundable == 1) <span class="badge bg-green">refundable</span> @else <span class="badge bg-red">not refundable</span> @endif
-                                @if($item->enable_server_restriction == 0) <span class="badge bg-green">unrestricted</span> @else <span class="badge bg-red">restricted</span> @endif
-                            </td>
-                        </tr>
-                        <!-- TODO: Add a column that shows if a user owns that item-->
-                        </tr>
+                        <tr><td>Objet</td><td>{{ $item->display_name }}</td></tr>
+                        <tr><td>Description</td><td>{{ $item->web_description ?: $item->description }}</td></tr>
+                        <tr><td>Catégorie</td><td>{{ $item->category ? $item->category->display_name : '' }}</td></tr>
+                        <tr><td>Type / emplacement</td><td>{{ $item->type }} / {{ $item->loadout_slot }}</td></tr>
+                        <tr><td>Prix</td><td><b>{{ $item->price }}</b> crédits (tu en as {{ $user->credits }})</td></tr>
+                        <tr><td>Déjà possédé</td><td>{{ $owned }} exemplaire(s)</td></tr>
+                        <tr><td>Infos</td><td>
+                            @if($item->is_refundable == 1) <span class="badge bg-green">revendable</span> @else <span class="badge bg-red">non revendable</span> @endif
+                            @if($item->enable_server_restriction == 1) <span class="badge bg-yellow">seulement sur certains serveurs</span> @endif
+                        </td></tr>
                     </table>
-                </div><!-- /.box-body -->
-                <div class="box-footer">
-                    {!! Form::open(['method' => 'post', 'url' => route('userpanel.useritems.buyproc', ["item_id" => $item->id])]) !!}
-                    {!! Form::submit('Buy',['class' => 'btn btn-success']) !!}
-                    {!! Form::close() !!}
                 </div>
-            </div><!-- /.box -->
-        </div><!-- /.col -->
-    </div><!-- /.row -->
-@stop
-
-@section('footer')
-    {{--<!-- DataTables CSS -->--}}
-    {{--<link rel="stylesheet" type="text/css" href="{{asset('templates/adminlte205/dist/css/jquery.dataTables.min.css')}}">--}}
-    {{--<!-- DataTables -->--}}
-    {{--<script type="text/javascript" charset="utf8" src="{{asset('templates/adminlte205/dist/js/jquery.dataTables.min.js')}}"></script>--}}
-
-    {{--<script>--}}
-        {{--$(document).ready( function () {--}}
-            {{--$('#table').DataTable({--}}
-                {{--processing: true,--}}
-                {{--serverSide: true,--}}
-                {{--ajax: '{{ route("userpanel.useritems.itemdata") }}',--}}
-                {{--columns: [--}}
-                    {{--{data: 'id', name: 'id'},--}}
-                    {{--{data: 'priority', name: 'priority'},--}}
-                    {{--{data: 'display_name', name: 'display_name'},--}}
-                    {{--{data: 'description', name: 'description'},--}}
-                    {{--{data: 'category.display_name', name: 'category', orderable: false, searchable: false},--}}
-                    {{--{data: 'loadout_slot', name: 'loadout_slot'},--}}
-                    {{--{data: 'price', name: 'price'},--}}
-                    {{--{data: 'action', name: 'Action', orderable: false, searchable: false},--}}
-                {{--]--}}
-            {{--});--}}
-        {{--} );--}}
-    {{--</script>--}}
+                <div class="box-footer">
+                    @if(!$buyable)
+                        <p class="text-red">Cet objet ne peut pas être acheté sur le site.</p>
+                    @elseif($item->price > $user->credits)
+                        <p class="text-red">Il te manque {{ $item->price - $user->credits }} crédits.</p>
+                    @else
+                        {!! Form::open(['method' => 'post', 'url' => route('userpanel.useritems.buyproc', ['item_id' => $item->id])]) !!}
+                        {!! Form::submit('Acheter pour ' . $item->price . ' crédits', ['class' => 'btn btn-success']) !!}
+                        <a class="btn btn-default" href="{{URL::route('userpanel.useritems.buyoverview')}}">Annuler</a>
+                        {!! Form::close() !!}
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 @stop

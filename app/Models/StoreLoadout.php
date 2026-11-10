@@ -1,5 +1,4 @@
-<?php namespace App\Models;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -16,33 +15,36 @@
 //
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// [multimod] Adapté au Store 1.2 : les loadouts sont communs à tous les joueurs
+// (store_loadouts : display_name, game, class, team). Chaque joueur y équipe ses propres
+// exemplaires via store_users_items_loadouts.
+
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StoreLoadout extends Model
 {
+    use CleansUtf8; // [multimod] textes coupés par le plugin
+
     protected $connection = 'store';
     protected $table = 'loadouts';
-    protected $fillable = ['display_name','game','class','team','privacy','owner_id'];
+    public $timestamps = false;
+    protected $fillable = ['display_name', 'game', 'class', 'team'];
 
-    public function owner()
+    protected static function boot()
     {
-        return $this->belongsTo('App\Models\StoreUser','owner_id','id');
+        parent::boot();
+
+        static::deleting(function (StoreLoadout $loadout) {
+            $loadout->userItems()->detach();
+        });
     }
 
-    public function subscribers()
+    /** Exemplaires équipés dans ce loadout (tous joueurs confondus). */
+    public function userItems()
     {
-        return $this->belongsToMany('App\Models\StoreUser','users_loadouts', 'loadout_id', 'user_id')->withTimestamps();
-    }
-
-    public function items()
-    {
-        return $this->belongsToMany('App\Models\StoreItem','items_loadouts', 'loadout_id', 'item_id')->withTimestamps();
-    }
-
-    public function equipped_users()
-    {
-        return $this->hasMany('App\Models\StoreUser','eqp_loadout_id','id');
+        return $this->belongsToMany('App\Models\StoreUserItem', 'users_items_loadouts', 'loadout_id', 'useritem_id');
     }
 }

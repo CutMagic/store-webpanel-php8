@@ -17,7 +17,7 @@
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use App\User;
+use App\Models\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -57,9 +57,10 @@ class UsersController extends Controller
      */
     public function store(Requests\PanelUserRequest $request)
     {
-        $input = $request->all();
-
-        $user = User::create($input);
+        // [multimod] le mot de passe est haché AVANT l'enregistrement (avant : enregistré en clair puis remplacé)
+        $user = new User();
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
         $user->password = bcrypt($request->input('password'));
         $user->save();
 
@@ -87,7 +88,7 @@ class UsersController extends Controller
      */
     public function edit(User $panel_user)
     {
-        $current_roles = array_pluck($panel_user->roles()->get(['roles.id'])->toArray(),'id');
+        $current_roles = \Illuminate\Support\Arr::pluck($panel_user->roles()->get(['roles.id'])->toArray(),'id');
         return view('templates.' . \Config::get('webpanel.template') . 'webpanel.panel.users.edit', compact('panel_user','current_roles'));
     }
 
@@ -100,13 +101,13 @@ class UsersController extends Controller
      */
     public function update(User $panel_user, Requests\PanelUserRequest $request)
     {
-        $panel_user->update($request->all());
-
-        if($panel_user->password != bcrypt($request->input('password')))
-        {
+        // [multimod] nom et e-mail seulement ; le mot de passe ne change que s'il est rempli
+        $panel_user->name = $request->input('name');
+        $panel_user->email = $request->input('email');
+        if ((string) $request->input('password') !== '') {
             $panel_user->password = bcrypt($request->input('password'));
-            $panel_user->save();
         }
+        $panel_user->save();
 
         $this->SyncRoles($panel_user, $request->input('role_list'));
         return redirect()->route('webpanel.panel.users.index');

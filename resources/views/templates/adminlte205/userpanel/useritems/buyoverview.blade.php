@@ -1,82 +1,50 @@
-{{--Copyright (c) 2015 "Werner Maisl"--}}
-
-{{--This file is part of the Store Webpanel V2.--}}
-
-{{--The Store Webpanel V2 is free software: you can redistribute it and/or modify--}}
-{{--it under the terms of the GNU Affero General Public License as--}}
-{{--published by the Free Software Foundation, either version 3 of the--}}
-{{--License, or (at your option) any later version.--}}
-
-{{--This program is distributed in the hope that it will be useful,--}}
-{{--but WITHOUT ANY WARRANTY; without even the implied warranty of--}}
-{{--MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the--}}
-{{--GNU Affero General Public License for more details.--}}
-
-{{--You should have received a copy of the GNU Affero General Public License--}}
-{{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
+{{-- [multimod] Boutique du site (Store 1.2) --}}
 @extends('templates.adminlte205.userpanel.app')
 
-@section('title', 'UserItems')
+@section('title', 'Boutique')
 
-@section('subtitle', 'Shop')
+@section('subtitle', number_format($user->credits, 0, ',', ' ') . ' crédits')
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Items</li>
-    <li class="active">Shop</li>
+    <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> Accueil</a></li>
+    <li class="active">Boutique</li>
 @stop
 
 @section('content')
     <div class="row">
         <div class="col-md-12">
             <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">Items for Sale</h3>
-                </div><!-- /.box-header -->
+                <div class="box-header"><h3 class="box-title">Objets en vente</h3></div>
                 <div class="box-body">
                     <table class="table table-bordered table-striped" id="table">
                         <thead>
-                            <tr>
-                                <th style="width: 10px">ID</th>
-                                <th style="width: 10px">Prio</th>
-                                <th>Display Name</th>
-                                <th>Description</th>
-                                <th>Category</th>
-                                <th>Loadout Slot</th>
-                                <th>Price</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Objet</th><th>Catégorie</th><th>Type</th><th>Emplacement</th><th>Prix</th><th></th></tr>
                         </thead>
+                        <tbody>
+                        @foreach($items as $item)
+                            <tr>
+                                <td>{{ $item->display_name }}<br><small class="text-muted">{{ $item->web_description ?: $item->description }}</small></td>
+                                <td>{{ $item->category ? $item->category->display_name : '' }}</td>
+                                <td>{{ $item->type }}</td>
+                                <td>{{ $item->loadout_slot }}</td>
+                                <td data-order="{{ $item->price }}">{{ $item->price }}</td>
+                                <td><a class="btn btn-success btn-xs {{ $item->price > $user->credits ? 'disabled' : '' }}" href="{{ route('userpanel.useritems.buyconf', ['item_id' => $item->id]) }}">Acheter</a></td>
+                            </tr>
+                        @endforeach
+                        </tbody>
                     </table>
-                </div><!-- /.box-body -->
-            </div><!-- /.box -->
-        </div><!-- /.col -->
-    </div><!-- /.row -->
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('footer')
-    <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="{{asset('templates/adminlte205/dist/css/jquery.dataTables.min.css')}}">
-    <!-- DataTables -->
     <script type="text/javascript" charset="utf8" src="{{asset('templates/adminlte205/dist/js/jquery.dataTables.min.js')}}"></script>
-
     <script>
-        $(document).ready( function () {
-            $('#table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: '{{ route("userpanel.useritems.itemdata") }}',
-                columns: [
-                    {data: 'id', name: 'id'},
-                    {data: 'priority', name: 'priority'},
-                    {data: 'display_name', name: 'display_name'},
-                    {data: 'description', name: 'description'},
-                    {data: 'category.display_name', name: 'category', orderable: false, searchable: false},
-                    {data: 'loadout_slot', name: 'loadout_slot'},
-                    {data: 'price', name: 'price'},
-                    {data: 'action', name: 'Action', orderable: false, searchable: false},
-                ]
-            });
-        } );
+        $(document).ready(function () {
+            $('#table').DataTable({ pageLength: 25, language: { search: 'Rechercher :', lengthMenu: '_MENU_ par page', info: '_START_ à _END_ sur _TOTAL_', paginate: { previous: 'Préc.', next: 'Suiv.' }, zeroRecords: 'Aucun objet', infoEmpty: '' } });
+        });
     </script>
 @stop

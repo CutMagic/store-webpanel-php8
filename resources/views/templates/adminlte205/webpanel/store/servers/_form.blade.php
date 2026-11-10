@@ -22,6 +22,12 @@
                 <h3 class="box-title">{{$LeftMenuTitle}}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
+                {{-- [multimod] numéro du serveur = server_id de la config du Store sur ce serveur de jeu --}}
+                <div class="form-group">
+                    {!! Form::label('id', 'Server ID (store server_id)') !!}
+                    {!! Form::text('id', null, ['class' => 'form-control']) !!}
+                    <p class="help-block">Same number as the Store "server_id" setting on that game server.</p>
+                </div>
                 <div class="form-group">
                     {!! Form::label('name', 'Name') !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}

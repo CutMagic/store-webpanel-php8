@@ -20,7 +20,7 @@
 use App\Models\StoreUser;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Yajra\Datatables\Datatables;
+use Yajra\DataTables\Facades\DataTables as Datatables;
 
 class UsersController extends Controller
 {
@@ -116,6 +116,7 @@ class UsersController extends Controller
      */
     public function getData()
     {
+        $this->onlyColumns(['id', 'auth', 'name', 'credits', 'action']); // [multimod] colonnes autorisées uniquement
         $users = StoreUser::select(['id','auth','name','credits']);
 
         return Datatables::of($users)
@@ -123,7 +124,7 @@ class UsersController extends Controller
                 $actions = view('templates.' . \Config::get('webpanel.template') . 'webpanel.store.users._actions', compact('user'))->render();
                 return $actions;
             })
-            ->make();
+            ->rawColumns(['action'])->make(true); // [php82] colonnes par nom ; tout est échappé sauf action
     }
 
 }

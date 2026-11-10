@@ -64,7 +64,15 @@
             $('#table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("webpanel.store.items.data") }}'
+                ajax: '{{ route("webpanel.store.items.data") }}',
+                columns: [
+                    {data: 'id', name: 'id'},
+                    {data: 'priority', name: 'priority'},
+                    {data: 'name', name: 'name'},
+                    {data: 'type', name: 'type'},
+                    {data: 'price', name: 'price'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ] // [php82] colonnes par nom (la colonne action seule n'est pas échappée)
             });
         } );
     </script>

@@ -22,8 +22,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StoreVersion extends Model
 {
+    use CleansUtf8; // [multimod] textes coupés par le plugin
+
     protected $connection = 'store';
     protected $table = 'versions';
+    public $timestamps = false; // [multimod] store_versions n'a que last_updated
     protected $fillable = [];
 
 }

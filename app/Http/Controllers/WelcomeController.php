@@ -1,5 +1,4 @@
-<?php namespace App\Http\Controllers;
-
+<?php
 //Copyright (c) 2015 "Werner Maisl"
 //
 //This file is part of the Store Webpanel V2.
@@ -17,38 +16,13 @@
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+namespace App\Http\Controllers;
+
+// [php82] page d'accueil (middleware "guest" déclaré dans routes/web.php)
 class WelcomeController extends Controller
 {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Welcome Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller renders the "marketing page" for the application and
-    | is configured to only allow guests. Like most of the other sample
-    | controllers, you are free to modify or remove it as you desire.
-    |
-    */
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
-
-    /**
-     * Show the application welcome screen to the user.
-     *
-     * @return Response
-     */
     public function index()
     {
         return view('templates.' . \Config::get('webpanel.template') . 'welcome');
     }
-
 }

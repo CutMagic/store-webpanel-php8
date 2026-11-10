@@ -17,9 +17,9 @@
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use App\Permission;
-use App\Role;
-use App\User;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
@@ -107,7 +107,7 @@ class WebpanelAddPermissionsRoles extends Migration {
         $rootadmin->save();
 
         //Get all permissions
-        $ids = Permission::lists('id')->all();
+        $ids = Permission::pluck('id')->all();
 
         //Sync them to the rootadmin
         $rootadmin->perms()->sync($ids);
@@ -115,9 +115,20 @@ class WebpanelAddPermissionsRoles extends Migration {
 
         //Creates an admin user
         $admin = new User();
+        // [multimod] plus de mot de passe "password" connu de tous : on prend celui du .env
+        // (WEBPANEL_ADMIN_EMAIL / WEBPANEL_ADMIN_PASSWORD) ou on en génère un au hasard,
+        // écrit dans storage/app/premier-admin.txt (à lire puis supprimer).
+        $email    = env('WEBPANEL_ADMIN_EMAIL', 'admin@admin.com');
+        $password = env('WEBPANEL_ADMIN_PASSWORD', '');
+        if ($password == '') {
+            $password = \Illuminate\Support\Str::random(16);
+            file_put_contents(storage_path('app/premier-admin.txt'),
+                "Compte admin du WebPanel\r\nE-mail : " . $email . "\r\nMot de passe : " . $password .
+                "\r\n\r\nChange-le apres la premiere connexion, puis supprime ce fichier.\r\n");
+        }
         $admin->name = 'admin';
-        $admin->email = 'admin@admin.com';
-        $admin->password = bcrypt('password');
+        $admin->email = $email;
+        $admin->password = bcrypt($password);
         $admin->save();
 
         $admin->roles()->sync(array($rootadmin->id));

@@ -17,7 +17,7 @@
 //You should have received a copy of the GNU Affero General Public License
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use App\Permission;
+use App\Models\Permission;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -83,7 +83,7 @@ class PermissionsController extends Controller
      */
     public function edit($permission)
     {
-        $current_roles = array_pluck($permission->roles()->get(['roles.id'])->toArray(),'id');
+        $current_roles = \Illuminate\Support\Arr::pluck($permission->roles()->get(['roles.id'])->toArray(),'id');
         return view('templates.' . \Config::get('webpanel.template') . 'webpanel.panel.permissions.edit', compact('permission','current_roles'));
     }
 

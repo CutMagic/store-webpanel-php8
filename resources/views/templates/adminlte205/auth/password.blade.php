@@ -1,50 +1,35 @@
-{{--Copyright (c) 2015 "Werner Maisl"--}}
-
-{{--This file is part of the Store Webpanel V2.--}}
-
-{{--The Store Webpanel V2 is free software: you can redistribute it and/or modify--}}
-{{--it under the terms of the GNU Affero General Public License as--}}
-{{--published by the Free Software Foundation, either version 3 of the--}}
-{{--License, or (at your option) any later version.--}}
-
-{{--This program is distributed in the hope that it will be useful,--}}
-{{--but WITHOUT ANY WARRANTY; without even the implied warranty of--}}
-{{--MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the--}}
-{{--GNU Affero General Public License for more details.--}}
-
-{{--You should have received a copy of the GNU Affero General Public License--}}
-{{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
+{{-- [php82] Mot de passe oublié (comptes admin) : demande du lien par mail --}}
 @extends('templates.adminlte205.auth.app')
 
-@section('title', 'Password Reset')
+@section('title', 'Mot de passe oublié')
 
-@section('body-class', 'register-page')
+@section('body-class', 'login-page')
 
 @section('body')
-    <div class="register-box">
-        <div class="register-logo">
-            <a href="#"><b>Store</b>WebPanel</a>
-        </div>
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="{{ url('/') }}"><b>Store</b>WebPanel</a>
+        </div><!-- /.login-logo -->
+        <div class="login-box-body">
+            <p class="login-box-msg">Mot de passe oublié ? Indique l'adresse e-mail de ton compte admin : tu recevras un lien pour en choisir un nouveau.</p>
 
-        <div class="register-box-body">
-            <p class="login-box-msg">Reset your Password</p>
-
-            <form method="POST" action="{{ url('/password/email') }}">
+            <form method="POST" action="{{ route('password.email') }}">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                 <div class="form-group has-feedback">
-                    <input type="text" class="form-control" placeholder="Email" name="email" value="{{ old('email') }}"/>
+                    <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="E-mail" required>
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat">Send Reset Mail</button>
-                    </div><!-- /.col -->
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">Envoyer le lien</button>
+                    </div>
                 </div>
-
             </form>
-            <a href="{{ url('/auth/login') }}" class="text-center">I already have a membership</a>
-        </div><!-- /.form-box -->
-    </div><!-- /.register-box -->
+
+            <br>
+            <a href="{{ route('login') }}">Retour à la connexion</a>
+        </div><!-- /.login-box-body -->
+    </div><!-- /.login-box -->
 @stop
