@@ -23,6 +23,12 @@ Liste des failles corrigées : [SECURITY-FIXES.txt](SECURITY-FIXES.txt).
   SteamID64, lien du profil Steam), profil de chaque joueur avec ses SteamID, le lien vers son profil
   Steam et ses objets possédés et équipés (lecture seule, joueurs connectés seulement). Réglages `.env` :
   `USERPANEL_PLAYER_PROFILES` (page entière) et `USERPANEL_PLAYER_PROFILES_CREDITS` (crédits des autres).
+- **Page « Joueurs » publique (option)** : dans l'admin, **Réglages du site** permet de montrer la page
+  Joueurs à tout le monde, sans connexion Steam (adresse `/players`), pour qu'elle apparaisse sur Google.
+  Désactivée par défaut. Avec : titre, description et adresse canonique pour Google, données structurées
+  « page de profil », plan du site `/sitemap.xml` (accueil + un profil par joueur), `/robots.txt` qui
+  bloque l'admin et l'espace joueur, 120 pages par minute et par adresse IP au plus. Même page :
+  nom et description du site (accueil, pages publiques, résultats Google).
 - **Français / anglais** : bouton FR / EN sur tout le site (accueil, connexion, espace joueur et panneau
   d'administration). Langue par défaut : `APP_LOCALE`. Textes français dans `lang/fr.json`.
 - **Connexion joueur par Steam OpenID** : pas besoin de clé API Steam.

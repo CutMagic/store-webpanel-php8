@@ -14,13 +14,22 @@
 
 {{--You should have received a copy of the GNU Affero General Public License--}}
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
-{{-- [multimod] page d'accueil lisible (texte foncé, vrais boutons) et bouton de langue FR / EN --}}
+{{-- [multimod] page d'accueil lisible (texte foncé, vrais boutons) et bouton de langue FR / EN.
+     Nom et description du site, bouton "Joueurs" : Admin > Réglages du site. --}}
+@php($siteName = \App\Support\PanelSettings::siteName())
+@php($siteDescription = \App\Support\PanelSettings::siteDescription())
+@php($publicPlayers = \App\Support\PanelSettings::publicPlayers())
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Store WebPanel</title>
+    <title>{{ $siteName }}</title>
+    <meta name="description" content="{{ $siteDescription !== '' ? $siteDescription : __('Web panel of the SourceMod Store plugin') }}">
+    <link rel="canonical" href="{{ url('/') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $siteName }}">
+    <meta property="og:url" content="{{ url('/') }}">
 
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -41,6 +50,7 @@
         }
         .content { text-align: center; max-width: 760px; }
         .title {
+            word-break: break-word;
             font-size: 64px;
             font-weight: 300;
             color: #111;
@@ -64,6 +74,8 @@
             text-decoration: none;
         }
         .buttons a:hover, .buttons a:focus { background: #2f6f95; }
+        .buttons a.players { background: #00733e; }
+        .buttons a.players:hover, .buttons a.players:focus { background: #005a30; }
         .buttons a.secondary { background: #222d32; }
         .buttons a.secondary:hover, .buttons a.secondary:focus { background: #111; }
         .footer {
@@ -87,11 +99,14 @@
 <body>
 @include('templates.adminlte205.includes.langswitch', ['style' => 'plain'])
 <div class="content">
-    <h1 class="title">Store WebPanel</h1>
-    <div class="subtitle">{{ __('Web panel of the SourceMod Store plugin') }}</div>
+    <h1 class="title">{{ $siteName }}</h1>
+    <div class="subtitle">{{ $siteDescription !== '' ? $siteDescription : __('Web panel of the SourceMod Store plugin') }}</div>
     <div class="buttons">
-        <a href="{{ URL::route('userpanel.dashboard') }}"><i class="fa fa-user"></i> {{ __('Player area') }}</a>
-        <a href="{{ URL::route('webpanel.dashboard') }}" class="secondary"><i class="fa fa-lock"></i> {{ __('Admin area') }}</a>
+        @if ($publicPlayers)
+            <a href="{{ route('players.index') }}" class="players"><i class="fa fa-users"></i> {{ __('Players') }}</a>
+        @endif
+        <a href="{{ URL::route('userpanel.dashboard') }}" rel="nofollow"><i class="fa fa-user"></i> {{ __('Player area') }}</a>
+        <a href="{{ URL::route('webpanel.dashboard') }}" class="secondary" rel="nofollow"><i class="fa fa-lock"></i> {{ __('Admin area') }}</a>
     </div>
     <div class="footer">
         Store Webpanel 2 - &copy; 2015-2016 Werner Maisl<br>

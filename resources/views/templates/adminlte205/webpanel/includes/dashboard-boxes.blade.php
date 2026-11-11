@@ -46,6 +46,7 @@
                 <a href="{{ route('webpanel.store.tools.index') }}" class="btn btn-default"><i class="fa fa-wrench"></i> {{ __('Tools') }}</a>
                 <a href="{{ route('webpanel.store.versions.index') }}" class="btn btn-default"><i class="fa fa-desktop"></i> {{ __('Versions') }}</a>
                 <a href="{{ url('/userpanel') }}" class="btn btn-default"><i class="fa fa-user"></i> {{ __('Player area') }}</a>
+                <a href="{{ route('webpanel.settings.index') }}" class="btn btn-default"><i class="fa fa-sliders"></i> {{ __('Site settings') }}</a>
             </div>
         </div>
     </div>

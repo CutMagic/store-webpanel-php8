@@ -1,13 +1,26 @@
-{{-- [multimod] Profil d'un joueur : SteamID, crédits, objets équipés et possédés (lecture seule) --}}
-@extends('templates.adminlte205.userpanel.app')
+{{-- [multimod] Profil d'un joueur : SteamID, crédits, objets équipés et possédés (lecture seule).
+     Sert aussi la page publique /players/{id} ($public = true, mise en page $layout, routes $routes). --}}
+@extends($layout)
 
 @section('title', $player->name)
 
 @section('subtitle', __('player profile'))
 
+@if ($public)
+    @section('description', trim(__('Profile of :name on :site.', ['name' => $player->name, 'site' => \App\Support\PanelSettings::siteName()])
+        . ($steam ? ' SteamID ' . $steam['steam2'] . '.' : '')
+        . ' ' . __(':count owned item(s), :equipped equipped.', ['count' => $itemCount, 'equipped' => $equippedCount])
+        . ($showCredits ? ' ' . __(':credits credits.', ['credits' => number_format($player->credits, 0, ',', ' ')]) : '')))
+    @section('canonical', route('players.show', ['id' => $player->id]))
+@endif
+
 @section('breadcrumb')
-    <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
-    <li><a href="{{URL::route('userpanel.players.index')}}">{{ __('Players') }}</a></li>
+    @if ($public)
+        <li><a href="{{ url('/') }}"><i class="fa fa-home"></i> {{ __('Home') }}</a></li>
+    @else
+        <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    @endif
+    <li><a href="{{ route($routes . 'index') }}">{{ __('Players') }}</a></li>
     <li class="active">{{ __('Profile') }}</li>
 @stop
 
@@ -18,6 +31,20 @@
         .steamids dt { float: left; width: 90px; color: #444; font-weight: 600; }
         .steamids dd { margin-left: 100px; font-family: Consolas, Menlo, monospace; }
     </style>
+    @if ($public)
+        {{-- données structurées "page de profil" pour Google (JSON_HEX_TAG : un pseudo ne peut pas fermer la balise) --}}
+        <script type="application/ld+json">{!! json_encode(array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'ProfilePage',
+            'url' => route('players.show', ['id' => $player->id]),
+            'mainEntity' => array_filter([
+                '@type' => 'Person',
+                'name' => $player->name,
+                'identifier' => $steam ? $steam['steam2'] : null,
+                'sameAs' => $steam ? $steam['url'] : null,
+            ]),
+        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) !!}</script>
+    @endif
 @stop
 
 @section('content')
@@ -25,7 +52,7 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-body clearfix">
-                    <img src="{{ route('userpanel.steamimage.auth', ['auth' => max(0, (int) $player->auth)]) }}" class="profile-avatar" alt="">
+                    <img src="{{ route('userpanel.steamimage.auth', ['auth' => max(0, (int) $player->auth)]) }}" class="profile-avatar" alt="{{ $player->name }}">
                     <h3 style="margin-top: 4px">
                         {{ $player->name }}
                         @if ($isMe) <span class="label label-warning">{{ __('you') }}</span> @endif
@@ -42,7 +69,7 @@
                     @else
                         <p class="text-muted">{{ __('Unknown SteamID (player without a valid Steam account).') }}</p>
                     @endif
-                    <a href="{{ route('userpanel.players.index') }}" class="btn btn-default btn-sm" style="margin-top: 8px">
+                    <a href="{{ route($routes . 'index') }}" class="btn btn-default btn-sm" style="margin-top: 8px">
                         <i class="fa fa-arrow-left"></i> {{ __('Back to players') }}
                     </a>
                 </div>

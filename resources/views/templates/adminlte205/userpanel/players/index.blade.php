@@ -1,12 +1,26 @@
-{{-- [multimod] Classement des joueurs, recherche par pseudo ou SteamID (lecture seule) --}}
-@extends('templates.adminlte205.userpanel.app')
+{{-- [multimod] Classement des joueurs, recherche par pseudo ou SteamID (lecture seule).
+     Sert aussi la page publique /players ($public = true, mise en page $layout, routes $routes). --}}
+@extends($layout)
 
 @section('title', __('Players'))
 
 @section('subtitle', $showCredits ? __('ranking by credits') : __('player list'))
 
+@if ($public)
+    @section('description', $showCredits
+        ? __('Ranking of the :count players of :site: credits, items and SteamID of each player.', ['count' => $players->total(), 'site' => \App\Support\PanelSettings::siteName()])
+        : __('The :count players of :site: items and SteamID of each player.', ['count' => $players->total(), 'site' => \App\Support\PanelSettings::siteName()]))
+    @section('canonical', route('players.index', $players->currentPage() > 1 ? ['page' => $players->currentPage()] : []))
+    {{-- les résultats de recherche ne sont pas à indexer --}}
+    @section('robots', $q !== '' ? 'noindex,follow' : 'index,follow')
+@endif
+
 @section('breadcrumb')
-    <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    @if ($public)
+        <li><a href="{{ url('/') }}"><i class="fa fa-home"></i> {{ __('Home') }}</a></li>
+    @else
+        <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    @endif
     <li class="active">{{ __('Players') }}</li>
 @stop
 
@@ -23,7 +37,7 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header">
-                    <form method="get" action="{{ route('userpanel.players.index') }}" class="form-inline">
+                    <form method="get" action="{{ route($routes . 'index') }}" class="form-inline">
                         <div class="input-group" style="max-width: 560px; width: 100%">
                             <input type="text" name="q" value="{{ $q }}" maxlength="64" class="form-control"
                                    placeholder="{{ __('Name or SteamID (STEAM_0:1:..., [U:1:...], 7656119..., Steam profile link)') }}">
@@ -32,10 +46,10 @@
                             </span>
                         </div>
                         @if ($q !== '')
-                            <a href="{{ route('userpanel.players.index') }}" class="btn btn-default">{{ __('Show all') }}</a>
+                            <a href="{{ route($routes . 'index') }}" class="btn btn-default">{{ __('Show all') }}</a>
                         @endif
                         @if ($myPage)
-                            <a href="{{ route('userpanel.players.index', ['page' => $myPage]) }}" class="btn btn-default"><i class="fa fa-user"></i> {{ __('My rank') }}</a>
+                            <a href="{{ route($routes . 'index', ['page' => $myPage]) }}" class="btn btn-default"><i class="fa fa-user"></i> {{ __('My rank') }}</a>
                         @endif
                     </form>
                 </div>
@@ -52,7 +66,7 @@
                             <tr class="{{ $r->is_me ? 'is-me' : '' }}">
                                 @if ($showCredits)<td>{{ $r->rank }}</td>@endif
                                 <td>
-                                    <a href="{{ route('userpanel.players.show', ['id' => $r->id]) }}">
+                                    <a href="{{ route($routes . 'show', ['id' => $r->id]) }}">
                                         <img src="{{ route('userpanel.steamimage.auth', ['auth' => max(0, (int) $r->auth)]) }}" class="player-avatar" alt="" loading="lazy">{{ $r->name }}
                                     </a>
                                     @if ($r->is_me) <span class="label label-warning">{{ __('you') }}</span> @endif

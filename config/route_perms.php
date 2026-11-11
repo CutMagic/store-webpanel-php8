@@ -27,6 +27,12 @@ return [
         //Permissions for the WebPanel Dashboard
         'dashboard'        => '',
 
+        // [multimod] réglages du site : réservé aux admins qui gèrent les comptes admin
+        'settings' => [
+            'index'      => 'WebPanelPanelUsersEdit',
+            'update'     => 'WebPanelPanelUsersEdit',
+        ],
+
         // Permissions for the Store Part of the WebPanel
         'store' => [
             //Permissions for the WebPanel Store Items

@@ -53,5 +53,8 @@ return [
         'web_color' => 'couleur sur le site',
         'web_description' => 'description sur le site',
         'auth' => 'auth (numéro de compte Steam)',
+        'site_name' => 'nom du site',
+        'site_description' => 'description du site',
+        'public_players' => 'page Joueurs publique',
     ],
 ];

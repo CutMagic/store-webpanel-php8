@@ -4,7 +4,9 @@
 // [multimod] Page "Joueurs" de l'espace joueur : classement, recherche (pseudo ou SteamID) et profil
 // des autres joueurs (SteamID, crédits, objets possédés et équipés), en LECTURE SEULE.
 // Réglages dans .env : USERPANEL_PLAYER_PROFILES (page entière) et USERPANEL_PLAYER_PROFILES_CREDITS
-// (crédits et rang des autres joueurs). Réservé aux joueurs connectés (middleware storeuserauth).
+// (crédits et rang des autres joueurs). Dans l'espace joueur : joueurs connectés (middleware storeuserauth).
+// Version publique (/players, sans connexion Steam, visible par Google) si l'admin l'active dans
+// Admin > Réglages du site (App\Support\PanelSettings).
 
 namespace App\Http\Controllers\UserPanel;
 
@@ -14,6 +16,7 @@ use App\Models\StoreUser;
 use App\Models\StoreItem;
 use App\Models\StoreLoadout;
 use App\Support\SteamIds;
+use App\Support\PanelSettings;
 use App\Support\Utf8;
 use DB;
 
@@ -31,9 +34,26 @@ class PlayersController extends Controller
         return (bool) config('userpanel.player_profiles_credits');
     }
 
-    private static function view($name, $data)
+    private function checkPublic()
     {
-        return view('templates.' . config('userpanel.template') . 'userpanel.players.' . $name, $data);
+        if (!PanelSettings::publicPlayers()) abort(404);
+    }
+
+    private static function view($name, $data, $public)
+    {
+        $tpl = 'templates.' . config('userpanel.template');
+        $data['public'] = $public;
+        // pages publiques : mise en page sans menu joueur ; liens vers /players au lieu de /userpanel/players
+        $data['layout'] = $tpl . ($public ? 'public.app' : 'userpanel.app');
+        $data['routes'] = $public ? 'players.' : 'userpanel.players.';
+        return view($tpl . 'userpanel.players.' . $name, $data);
+    }
+
+    /** Joueur connecté (ou null pour un visiteur de la page publique). */
+    private static function currentPlayer(Request $request)
+    {
+        $id = $request->session()->get('store_user_id');
+        return $id === null ? null : StoreUser::find($id);
     }
 
     /** Rang d'un joueur au classement des crédits (1 = le plus riche), comme le tableau de bord. */
@@ -42,11 +62,34 @@ class PlayersController extends Controller
         return StoreUser::where('credits', '>', $credits)->count() + 1;
     }
 
-    /** Classement des joueurs, avec recherche par pseudo ou SteamID. */
     public function getIndex(Request $request)
     {
         $this->checkEnabled();
-        $me = StoreUser::findOrFail($request->session()->get('store_user_id'));
+        return $this->index($request, false);
+    }
+
+    public function getPublicIndex(Request $request)
+    {
+        $this->checkPublic();
+        return $this->index($request, true);
+    }
+
+    public function getShow(Request $request, $id)
+    {
+        $this->checkEnabled();
+        return $this->show($request, $id, false);
+    }
+
+    public function getPublicShow(Request $request, $id)
+    {
+        $this->checkPublic();
+        return $this->show($request, $id, true);
+    }
+
+    /** Classement des joueurs, avec recherche par pseudo ou SteamID. */
+    private function index(Request $request, $public)
+    {
+        $me = self::currentPlayer($request);
         $showCredits = self::showCredits();
 
         $q = $request->query('q', '');
@@ -58,7 +101,7 @@ class PlayersController extends Controller
             // SteamID complet (STEAM_0:..., [U:1:...], 7656119..., adresse du profil) : on va directement au profil
             if ($account !== null && SteamIds::isExplicit($q)) {
                 $found = StoreUser::where('auth', $account)->first();
-                if ($found) return redirect()->route('userpanel.players.show', ['id' => $found->id]);
+                if ($found) return redirect()->route(($public ? '' : 'userpanel.') . 'players.show', ['id' => $found->id]);
             }
             $like = '%' . addcslashes($q, '\\%_') . '%';
             $query->where(function ($w) use ($like, $account) {
@@ -86,19 +129,18 @@ class PlayersController extends Controller
                 'rank' => $showCredits ? self::rank($p->credits) : null,
                 'items' => (int) ($itemCounts[$p->id] ?? 0),
                 'steam' => SteamIds::fromAccountId($p->auth),
-                'is_me' => $p->id == $me->id,
+                'is_me' => $me && $p->id == $me->id,
             ];
         }
-        $myPage = $showCredits ? (int) ceil(self::rank($me->credits) / self::PER_PAGE) : null;
+        $myPage = ($showCredits && $me) ? (int) ceil(self::rank($me->credits) / self::PER_PAGE) : null;
 
-        return self::view('index', compact('players', 'rows', 'q', 'showCredits', 'me', 'myPage'));
+        return self::view('index', compact('players', 'rows', 'q', 'showCredits', 'me', 'myPage'), $public);
     }
 
     /** Profil d'un joueur : SteamID, crédits, objets équipés et possédés. */
-    public function getShow(Request $request, $id)
+    private function show(Request $request, $id, $public)
     {
-        $this->checkEnabled();
-        $me = StoreUser::findOrFail($request->session()->get('store_user_id'));
+        $me = self::currentPlayer($request);
         $player = StoreUser::findOrFail((int) $id);
         $showCredits = self::showCredits();
         $st = DB::connection('store');
@@ -143,8 +185,8 @@ class PlayersController extends Controller
         $steam = SteamIds::fromAccountId($player->auth);
         $rank = $showCredits ? self::rank($player->credits) : null;
         $itemCount = array_sum($qty);
-        $isMe = $player->id == $me->id;
+        $isMe = $me && $player->id == $me->id;
 
-        return self::view('show', compact('player', 'steam', 'rank', 'owned', 'equipped', 'equippedCount', 'itemCount', 'showCredits', 'isMe'));
+        return self::view('show', compact('player', 'steam', 'rank', 'owned', 'equipped', 'equippedCount', 'itemCount', 'showCredits', 'isMe'), $public);
     }
 }

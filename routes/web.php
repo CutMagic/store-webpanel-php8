@@ -9,6 +9,8 @@ use App\Http\Controllers\InstallerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\WebPanel\DashboardController;
+use App\Http\Controllers\WebPanel\SettingsController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WebPanel\Store\ItemsController;
 use App\Http\Controllers\WebPanel\Store\CategoriesController;
 use App\Http\Controllers\WebPanel\Store\UsersController as StoreUsersController;
@@ -31,6 +33,15 @@ Route::get('/', [WelcomeController::class, 'index']);
 Route::get('lang/{locale}', [\App\Http\Controllers\LocaleController::class, 'switch'])->where('locale', 'fr|en')->name('lang.switch');
 Route::get('home', [HomeController::class, 'index'])->middleware('auth');
 
+// [multimod] page Joueurs publique (sans connexion Steam), si l'admin l'a activée dans
+// Admin > Réglages du site (sinon : 404). Limite : 120 pages par minute et par adresse IP.
+Route::middleware('throttle:120,1')->group(function () {
+    Route::get('players', [PlayersController::class, 'getPublicIndex'])->name('players.index');
+    Route::get('players/{id}', [PlayersController::class, 'getPublicShow'])->where('id', '[0-9]{1,10}')->name('players.show');
+    Route::get('sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
+});
+Route::get('robots.txt', [SitemapController::class, 'robots'])->name('robots');
+
 // Installateur (seulement tant que le fichier INSTALLED n'existe pas)
 Route::prefix('installer')->name('installer.')->group(function () {
     Route::middleware('notinstalled')->group(function () {
@@ -49,6 +60,10 @@ Route::prefix('installer')->name('installer.')->group(function () {
 // les autres sessions ouvertes sur ce compte sont déconnectées
 Route::middleware(['auth', 'auth.session', 'authorize'])->prefix('webpanel')->name('webpanel.')->group(function () {
     Route::get('', [DashboardController::class, 'showDashboard'])->name('dashboard');
+
+    // [multimod] réglages du site (page Joueurs publique, nom et description du site)
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingsController::class, 'update'])->name('settings.update');
 
     Route::prefix('store')->name('store.')->group(function () {
         Route::get('items/data', [ItemsController::class, 'getData'])->name('items.data');

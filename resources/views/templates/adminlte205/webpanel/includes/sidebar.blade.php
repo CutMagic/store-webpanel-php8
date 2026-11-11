@@ -21,6 +21,8 @@
         <ul class="sidebar-menu">
             <li class="header">{{ __('MAIN NAVIGATION') }}</li>
             <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-dashboard"></i> {{ __('Dashboard') }}</a></li>
+            {{-- [multimod] page Joueurs publique (Google), nom et description du site --}}
+            <li><a href="{{URL::route('webpanel.settings.index')}}"><i class="fa fa-sliders"></i> <span>{{ __('Site settings') }}</span></a></li>
 
             <!-- Store -->
             <li class="treeview">

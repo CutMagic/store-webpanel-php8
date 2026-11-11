@@ -120,6 +120,17 @@ Les joueurs n'ont pas de mot de passe (connexion Steam). Pour les admins, "Mot d
   Steam, objets possédés et équipés), en lecture seule, pour les joueurs connectés seulement. Dans .env :
   USERPANEL_PLAYER_PROFILES=false coupe la page, USERPANEL_PLAYER_PROFILES_CREDITS=false cache les
   crédits et le rang des autres joueurs.
+- Page "Joueurs" publique (désactivée par défaut) : panneau admin > "Réglages du site" > "Afficher la
+  page Joueurs à tout le monde (visible sur Google)". La page est alors à l'adresse /players, sans
+  connexion Steam, avec titres, descriptions et plan du site pour les moteurs de recherche
+  (/sitemap.xml, à envoyer dans la Google Search Console). Tout le monde voit alors le pseudo, les
+  SteamID, les objets (et les crédits, sauf si USERPANEL_PLAYER_PROFILES_CREDITS=false) de chaque
+  joueur. Limite : 120 pages par minute et par adresse IP. La même page règle le nom et la description
+  du site. Fichier des réglages : storage/app/panel-settings.json. Page réservée aux admins qui ont la
+  permission "Edit Panel Users" (WebPanelPanelUsersEdit).
+- /robots.txt est fabriqué par le site (bloque /webpanel, /userpanel, l'installateur et les pages de
+  connexion ; donne l'adresse du plan du site quand la page publique est activée). Si tu mets à jour
+  une ancienne copie en copiant les nouveaux fichiers par-dessus, supprime public/robots.txt.
 
 
 PLUGIN DU STORE (plugin-sourcemod-store.zip, sur la page Releases)
