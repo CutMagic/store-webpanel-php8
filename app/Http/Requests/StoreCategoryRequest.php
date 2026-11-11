@@ -39,10 +39,17 @@ class StoreCategoryRequest extends Request
      */
     public function rules()
     {
+        // [multimod] longueurs des colonnes de store_categories (avant : texte trop long coupé sans prévenir)
         return [
-            'priority' => 'numeric',
-            'display_name' => 'required',
-            'require_plugin' => 'required',
+            'priority' => 'nullable|integer|min:-1000000|max:1000000',
+            'display_name' => 'required|string|max:32',
+            'description' => 'nullable|string|max:128',
+            'require_plugin' => 'required|string|max:32',
+            'web_description' => 'nullable|string|max:65535',
+            'web_color' => 'nullable|string|max:10',
+            'enable_server_restriction' => 'nullable|in:0,1',
+            'server_list' => 'nullable|array',
+            'server_list.*' => 'integer',
         ];
     }
 

@@ -80,7 +80,7 @@ class UserItemsController extends Controller
     public function getBuyOverview(Request $request)
     {
         $user = $this->currentUser($request);
-        $items = StoreItem::with('category')->where('is_buyable', 1)
+        $items = StoreItem::with('category')->where('is_buyable', 1)->where('price', '>=', 0) // [multimod] comme webBuyable()
             ->where(function ($q) { $q->whereNull('flags')->orWhere('flags', ''); })
             ->orderBy('category_id')->orderBy('priority', 'desc')->orderBy('display_name')->get();
 

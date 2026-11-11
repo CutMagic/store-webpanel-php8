@@ -112,3 +112,17 @@ Compared with the original WebPanel-Core 2.0.1 (SourceMod-Store/WebPanel-Core).
          connexion de test joueur ne marche qu'avec APP_ENV=local et USERPANEL_DEV_LOGIN=true.
     EN : the "server login" (not part of Store 1.2) is disabled; the test player login only works
          with APP_ENV=local and USERPANEL_DEV_LOGIN=true.
+
+17. Formulaires admin : objets, catégories, joueurs / admin forms: items, categories, players
+    FR : un objet à prix négatif était accepté : en jeu, l'acheter fait GAGNER des crédits. Étaient aussi
+         acceptés sans prévenir : JSON des attrs invalide, catégorie inexistante (objet invisible en jeu),
+         textes plus longs que les colonnes (coupés), guillemets dans le nom (utilisé dans les requêtes du
+         plugin) ; un nom d'objet ou un auth de joueur en double donnait une erreur 500. Tout est
+         maintenant vérifié avec un message clair (prix >= 0 et entier, JSON valide, catégorie existante,
+         longueurs, nom unique, auth unique). Le site ne montre plus d'objet à prix négatif.
+    EN : an item with a negative price was accepted: buying it in game GIVES credits. Also silently
+         accepted: invalid attrs JSON, missing category (item invisible in game), texts longer than the
+         columns (cut), quotes in the name (used in the plugin's queries); a duplicate item name or player
+         auth caused an error 500. Everything is now checked with a clear message (integer price >= 0,
+         valid JSON, existing category, lengths, unique name, unique auth). The site no longer lists items
+         with a negative price.

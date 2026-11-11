@@ -18,6 +18,7 @@
 //along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use App\Http\Requests\Request;
+use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends Request
 {
@@ -39,10 +40,22 @@ class StoreUserRequest extends Request
      */
     public function rules()
     {
+        // [multimod] auth = numéro de compte Steam, unique (avant : doublon = erreur 500). Entiers 32 bits ;
+        // valeurs négatives acceptées comme le plugin (joueurs non-Steam, crédits en négatif).
+        $user = $this->route('store_user');
+        $id = is_object($user) ? $user->getKey() : (is_numeric($user) ? (int) $user : null);
+
         return [
-            'auth' => 'required|numeric',
-            'name' => 'required',
-            'credits' => 'required|numeric'
+            'auth' => ['required', 'integer', 'min:-2147483648', 'max:2147483647', Rule::unique('store.users', 'auth')->ignore($id)],
+            'name' => 'required|string|max:32',
+            'credits' => 'required|integer|min:-2147483648|max:2147483647',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'auth.unique' => __('A player with this Steam account number (auth) already exists.'),
         ];
     }
 
