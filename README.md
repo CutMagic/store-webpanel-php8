@@ -30,8 +30,9 @@ Liste des failles corrigées : [SECURITY-FIXES.txt](SECURITY-FIXES.txt).
 
 - PHP **8.2** ou plus récent (8.3, 8.4) avec les extensions `pdo_mysql`, `mbstring`, `openssl`,
   `tokenizer`, `xml`, `ctype`, `fileinfo`, `curl`.
-- MySQL / MariaDB, avec la base du plugin Store 1.2.
-- Le plugin SourceMod Store 1.2 sur le ou les serveurs de jeu.
+- MySQL / MariaDB, avec la base du plugin Store 1.2 (base neuve : `sql/store-tables-vierges.sql`
+  dans `plugin-sourcemod-store.zip` crée les tables vides).
+- Le plugin SourceMod Store 1.2 sur le ou les serveurs de jeu (fourni dans les Releases, voir plus bas).
 
 ## Installation
 
@@ -128,6 +129,26 @@ mots de passe admin solides, `.env` jamais partagé une fois rempli.
 - Les tables du Store 1.2 sont en MyISAM (pas de transactions) : chaque opération sur les crédits est
   une seule requête atomique, comme dans le plugin.
 - Connexion « store » en latin1, comme le plugin : les pseudos s'affichent comme en jeu.
+
+## Plugin SourceMod et packs (page Releases)
+
+- `plugin-sourcemod-store.zip` : les plugins SourceMod du store (`.smx` et leurs sources), configs,
+  traduction française complète et tables SQL vierges (`sql/store-tables-vierges.sql`).
+- `pack-skin-joueur.zip` : skins de joueur (modèles, matériaux et SQL d'import).
+- `pack-objets-store.zip` : trails, grenades, traceurs, couleurs d'armes... (fichiers et SQL d'import).
+
+**Origine du store** : [Store 1.2 Final de Drixevel](https://github.com/Drixevel/store/tree/1.2-Final)
+(Keith Warren, aujourd'hui [KeithGDR](https://github.com/KeithGDR) sur GitHub), suite du
+[Store d'alongub](https://github.com/alongubkin/store) (licence GPLv3).
+Notre version est **mise à jour pour SourceMod 1.12** :
+
+- modules d'objets adaptés et recompilés avec SourceMod 1.12, et passés de l'ancienne extension
+  SMJansson à l'extension [Jansson in Pawn](https://github.com/rejchev/sm-jansson) (**obligatoire**) ;
+- cœur du store : 2 petites corrections (requête compatible MySQL `ONLY_FULL_GROUP_BY`, syntaxe `view_as`) ;
+- traduction française complète, tables SQL vierges.
+
+> [KeithGDR/sm-store](https://github.com/KeithGDR/sm-store) (2025, même auteur) est une **autre version**
+> du store, avec d'autres noms de plugins et de phrases : ne pas mélanger ses fichiers avec ce pack.
 
 ## Licence
 

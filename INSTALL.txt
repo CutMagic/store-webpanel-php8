@@ -109,6 +109,19 @@ GOOD TO KNOW
 - The user interface of the player area is in French.
 
 
+STORE PLUGIN (plugin-sourcemod-store.zip, on the Releases page)
+---------------------------------------------------------------
+Based on Drixevel's "Store 1.2 Final" (Keith Warren, now KeithGDR on GitHub):
+https://github.com/Drixevel/store/tree/1.2-Final  - itself based on alongub's Store (GPLv3):
+https://github.com/alongubkin/store
+Our version is updated for SourceMod 1.12: item modules adapted and recompiled with SourceMod 1.12,
+moved from the old SMJansson extension to "Jansson in Pawn" (REQUIRED:
+https://github.com/rejchev/sm-jansson), 2 small fixes in the store core, full French translation,
+and sql/store-tables-vierges.sql to create the empty store tables.
+https://github.com/KeithGDR/sm-store (2025, same author) is a DIFFERENT version of the store: do
+not mix its files with this pack.
+
+
 LICENSE
 -------
 GNU Affero General Public License v3 (see LICENSE), like the original WebPanel-Core by Werner Maisl.
