@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Webpanel;
+<?php namespace App\Http\Controllers\WebPanel; // [php82] casse alignée sur le dossier (hébergeurs Linux)
 
 //Copyright (c) 2015 "Werner Maisl"
 //
