@@ -29,7 +29,7 @@ class LoginController extends Controller
         $key = 'login:' . strtolower($data['email']) . '|' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 5)) {
             return back()->withInput($request->only('email'))
-                ->withErrors(['email' => 'Trop d\'essais. Réessaie dans ' . RateLimiter::availableIn($key) . ' secondes.']);
+                ->withErrors(['email' => __('Too many attempts. Try again in :seconds seconds.', ['seconds' => RateLimiter::availableIn($key)])]);
         }
 
         if (Auth::attempt($data, $request->boolean('remember'))) {
@@ -40,7 +40,7 @@ class LoginController extends Controller
 
         RateLimiter::hit($key, 60);
         return back()->withInput($request->only('email', 'remember'))
-            ->withErrors(['email' => 'These credentials do not match our records.']);
+            ->withErrors(['email' => __('These credentials do not match our records.')]);
     }
 
     public function getLogout(Request $request)

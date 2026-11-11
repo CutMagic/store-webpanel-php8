@@ -16,7 +16,7 @@
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
 <header class="main-header">
     <!-- Logo -->
-    <a href="index2.html" class="logo"><b>User</b>Panel</a>
+    <a href="{{ route('userpanel.dashboard') }}" class="logo"><b>User</b>Panel</a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top" role="navigation">
         <!-- Sidebar toggle button-->
@@ -26,6 +26,7 @@
         <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
+                @include('templates.adminlte205.includes.langswitch', ['style' => 'nav'])
                 <!-- Messages: style can be found in dropdown.less-->
                 {{--<li class="dropdown messages-menu">--}}
                     {{--<a href="#" class="dropdown-toggle" data-toggle="dropdown">--}}
@@ -109,38 +110,38 @@
                         <span class="label label-warning">{{$credits}}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">Mon compte</li>
+                        <li class="header">{{ __('My account') }}</li>
                         <li>
                             <!-- inner menu: contains the actual data TODO: Add proper Icons-->
                             <ul class="menu">
                                 <li>
                                     <a href="#">
-                                        <i class="fa fa-users text-aqua"></i> Tu as {{$credits}} crédits
+                                        <i class="fa fa-money text-aqua"></i> {{ __('You have :credits credits', ['credits' => $credits]) }}
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <i class="fa fa-warning text-yellow"></i> Tu as {{$owned_item_count}} objet(s)
+                                        <i class="fa fa-cubes text-yellow"></i> {{ __('You have :count item(s)', ['count' => $owned_item_count]) }}
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{URL::route('userpanel.loadouts.index')}}">
-                                        <i class="fa fa-check text-green"></i> {{$equipped_count}} objet(s) équipé(s)
+                                        <i class="fa fa-check text-green"></i> {{ __(':count equipped item(s)', ['count' => $equipped_count]) }}
                                     </a>
                                 </li>
                             </ul>
                         </li>
-                        <li class="footer"><a href="{{URL::route('userpanel.dashboard')}}">Tableau de bord</a></li>
+                        <li class="footer"><a href="{{URL::route('userpanel.dashboard')}}">{{ __('Dashboard') }}</a></li>
                     </ul>
                 </li>
                 <!-- Tasks: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-flag-o"></i>
-                        <span class="label label-danger">5</span>
+                        <span class="label label-danger">{{ count($latest_items) }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">Derniers objets reçus</li>
+                        <li class="header">{{ __('Latest items received') }}</li>
                         <li>
                             <!-- inner menu: contains the actual data -->
                             <ul class="menu">
@@ -157,7 +158,7 @@
                             </ul>
                         </li>
                         <li class="footer">
-                            <a href="{{ URL::route("userpanel.useritems.index") }}">Voir tous mes objets</a>
+                            <a href="{{ URL::route("userpanel.useritems.index") }}">{{ __('See all my items') }}</a>
                         </li>
                     </ul>
                 </li>
@@ -173,28 +174,16 @@
                             <img src="{{URL::route("userpanel.steamimage.current") }}" class="img-circle" alt="User Image" />
                             <p>
                                 {{$username}}
-                                <small>{{$credits}} crédits</small>
+                                <small>{{ __(':credits credits', ['credits' => $credits]) }}</small>
                             </p>
-                        </li>
-                        <!-- Menu Body -->
-                        <li class="user-body"><!-- TODO: Add some meaningfull links here-->
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Followers</a>
-                            </div>
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Sales</a>
-                            </div>
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Friends</a>
-                            </div>
                         </li>
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a href="#" class="btn btn-default btn-flat">Profile</a><!-- TODO: Add a actual profile page-->
+                                @if (config('userpanel.player_profiles'))<a href="{{ route('userpanel.players.show', ['id' => (int) session('store_user_id')]) }}" class="btn btn-default btn-flat">{{ __('My profile') }}</a>@endif
                             </div>
                             <div class="pull-right">
-                                <a href="{{URL::route('userpanel.auth.logout')}}" class="btn btn-default btn-flat">Sign out</a>
+                                <a href="{{URL::route('userpanel.auth.logout')}}" class="btn btn-default btn-flat">{{ __('Log out') }}</a>
                             </div>
                         </li>
                     </ul>

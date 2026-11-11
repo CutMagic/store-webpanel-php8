@@ -106,7 +106,12 @@ GOOD TO KNOW
 - Store 1.2 tables are MyISAM (no transactions): every credit change is a single atomic query,
   like in the plugin.
 - The "store" database connection uses latin1, like the plugin, so player names look the same as in game.
-- The user interface of the player area is in French.
+- Home page, login pages and player area: French or English (FR / EN button, remembered for one year;
+  default language: APP_LOCALE in .env). The admin panel itself is in English.
+- "Players" page (player area): ranking by credits, search by name or SteamID (STEAM_0:..., [U:1:...],
+  SteamID64, Steam profile link) and each player's profile (SteamIDs, link to the Steam profile, owned
+  and equipped items), read-only, for signed-in players only. In .env: USERPANEL_PLAYER_PROFILES=false
+  turns the page off, USERPANEL_PLAYER_PROFILES_CREDITS=false hides the other players' credits and rank.
 
 
 STORE PLUGIN (plugin-sourcemod-store.zip, on the Releases page)

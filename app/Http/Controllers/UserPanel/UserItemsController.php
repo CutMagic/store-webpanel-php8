@@ -104,7 +104,7 @@ class UserItemsController extends Controller
         $item = StoreItem::findOrFail($item_id);
 
         if (!self::webBuyable($item)) {
-            return redirect()->route('userpanel.useritems.buyoverview')->withErrors(["Cet objet ne peut pas être acheté sur le site."]);
+            return redirect()->route('userpanel.useritems.buyoverview')->withErrors([__('This item cannot be bought on the website.')]);
         }
 
         $st = DB::connection('store');
@@ -112,7 +112,7 @@ class UserItemsController extends Controller
         $paid = $st->table('users')->where('id', $user->id)->where('credits', '>=', $item->price)
             ->decrement('credits', $item->price);
         if ($paid != 1) {
-            return redirect()->route('userpanel.useritems.buyconf', ['item_id' => $item->id])->withErrors(["Tu n'as pas assez de crédits."]);
+            return redirect()->route('userpanel.useritems.buyconf', ['item_id' => $item->id])->withErrors([__("You don't have enough credits.")]);
         }
 
         try {
@@ -126,11 +126,11 @@ class UserItemsController extends Controller
             // L'objet n'a pas pu être ajouté : on rend les crédits.
             $st->table('users')->where('id', $user->id)->increment('credits', $item->price);
             Log::error('[userpanel] achat échoué', ['user' => $user->id, 'item' => $item->id, 'err' => $e->getMessage()]);
-            return redirect()->route('userpanel.useritems.buyoverview')->withErrors(["L'achat a échoué, tes crédits ont été rendus."]);
+            return redirect()->route('userpanel.useritems.buyoverview')->withErrors([__('The purchase failed, your credits were given back.')]);
         }
 
         Log::info('[userpanel] achat', ['user' => $user->id, 'auth' => $user->auth, 'item' => $item->name, 'price' => $item->price]);
-        return redirect()->route('userpanel.useritems.index')->with('message', 'Achat réussi : ' . $item->display_name);
+        return redirect()->route('userpanel.useritems.index')->with('message', __('Purchase successful: :item', ['item' => $item->display_name]));
     }
 
     /**
@@ -150,7 +150,7 @@ class UserItemsController extends Controller
             ->orderBy('id', 'desc')
             ->pluck('id')->all();
         if (empty($ids)) {
-            return redirect()->route('userpanel.useritems.index')->withErrors(["Tu ne possèdes pas cet objet."]);
+            return redirect()->route('userpanel.useritems.index')->withErrors([__("You don't own this item.")]);
         }
         if (!$all) $ids = array_slice($ids, 0, 1);
 
@@ -169,8 +169,8 @@ class UserItemsController extends Controller
 
         Log::info('[userpanel] vente', ['user' => $user->id, 'item' => $item->name, 'nb' => $removed, 'refund' => $refundEach * $removed]);
         $msg = $refundEach > 0
-            ? "Vendu : {$removed} × {$item->display_name} (+" . ($refundEach * $removed) . " crédits)"
-            : "Jeté : {$removed} × {$item->display_name}";
+            ? __('Sold: :count × :item (+:credits credits)', ['count' => $removed, 'item' => $item->display_name, 'credits' => $refundEach * $removed])
+            : __('Thrown away: :count × :item', ['count' => $removed, 'item' => $item->display_name]);
         return redirect()->route('userpanel.useritems.index')->with('message', $msg);
     }
 }

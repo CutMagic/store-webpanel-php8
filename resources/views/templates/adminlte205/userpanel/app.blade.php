@@ -15,7 +15,7 @@
 {{--You should have received a copy of the GNU Affero General Public License--}}
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
 <!DOCTYPE html>
-<html>
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <title>Store | @yield('title')</title>
@@ -25,7 +25,7 @@
     <!-- Font Awesome Icons -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Ionicons -->
-    <link href="http://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
     <!-- Morris chart -->
     <link href="{{asset('templates/adminlte205/plugins/morris/morris.css')}}" rel="stylesheet" type="text/css" />
     <!-- jvectormap -->

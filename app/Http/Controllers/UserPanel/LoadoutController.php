@@ -72,13 +72,13 @@ class LoadoutController extends Controller
 
         $useritem = $st->table('users_items')->where('user_id', $user->id)->where('item_id', $item->id)->orderBy('id')->first();
         if ($useritem == null) {
-            return redirect()->route('userpanel.loadouts.index')->withErrors(["Tu ne possèdes pas cet objet."]);
+            return redirect()->route('userpanel.loadouts.index')->withErrors([__("You don't own this item.")]);
         }
 
         $this->unequipSlot($user->id, $loadout->id, $item->loadout_slot);
         $st->table('users_items_loadouts')->insert(['loadout_id' => $loadout->id, 'useritem_id' => $useritem->id]);
 
-        return redirect()->route('userpanel.loadouts.index')->with('message', $item->display_name . ' équipé dans « ' . $loadout->display_name . ' ».');
+        return redirect()->route('userpanel.loadouts.index')->with('message', __(':item equipped in ":loadout".', ['item' => $item->display_name, 'loadout' => $loadout->display_name]));
     }
 
     public function postUnequip(Request $request, $loadout, $item_id)
@@ -92,7 +92,7 @@ class LoadoutController extends Controller
             $st->table('users_items_loadouts')->where('loadout_id', $loadout->id)->whereIn('useritem_id', $ids)->delete();
         }
 
-        return redirect()->route('userpanel.loadouts.index')->with('message', $item->display_name . ' retiré de « ' . $loadout->display_name . ' ».');
+        return redirect()->route('userpanel.loadouts.index')->with('message', __(':item removed from ":loadout".', ['item' => $item->display_name, 'loadout' => $loadout->display_name]));
     }
 
     /** Déséquipe, pour ce joueur et ce loadout, tous les objets d'un emplacement. */

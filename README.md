@@ -16,8 +16,14 @@ Liste des failles corrigées : [SECURITY-FIXES.txt](SECURITY-FIXES.txt).
 
 - **Administration** : objets, catégories, joueurs et crédits, serveurs, rôles et permissions des
   comptes admin, import d'objets en JSON.
-- **Espace joueur** (`/userpanel`, en français) : tableau de bord (crédits, rang, objets), inventaire
+- **Espace joueur** (`/userpanel`) : tableau de bord (crédits, rang, objets), inventaire
   avec revente, boutique, objets équipés par loadout (un objet par emplacement, comme le plugin).
+- **Page « Joueurs »** : classement par crédits, recherche par pseudo ou SteamID (`STEAM_0:…`, `[U:1:…]`,
+  SteamID64, lien du profil Steam), profil de chaque joueur avec ses SteamID, le lien vers son profil
+  Steam et ses objets possédés et équipés (lecture seule, joueurs connectés seulement). Réglages `.env` :
+  `USERPANEL_PLAYER_PROFILES` (page entière) et `USERPANEL_PLAYER_PROFILES_CREDITS` (crédits des autres).
+- **Français / anglais** : bouton FR / EN sur l'accueil, les pages de connexion et l'espace joueur
+  (langue par défaut : `APP_LOCALE`). Le panneau d'administration reste en anglais.
 - **Connexion joueur par Steam OpenID** : pas besoin de clé API Steam.
 - **Deux bases** (ou une seule) : la base du **panneau** (tables `webpanel_*`, comptes admin, rôles,
   serveurs) et la base du **store** (tables `store_*` du plugin). Le panneau lit et modifie les données

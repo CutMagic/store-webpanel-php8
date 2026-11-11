@@ -16,28 +16,28 @@
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
 @extends('templates.adminlte205.auth.app')
 
-@section('title', 'Admin Login')
+@section('title', __('Admin login'))
 
 @section('body-class', 'login-page')
 
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a href="../../index2.html"><b>Store</b>WebPanel</a>
+            <a href="{{ url('/') }}"><b>Store</b>WebPanel</a>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
-            <p class="login-box-msg">Sign in to start your session</p>
+            <p class="login-box-msg">{{ __('Sign in to the admin panel') }}</p>
 
             <form method="POST" action="{{ url('/auth/login') }}">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                 <div class="form-group has-feedback">
-                    <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="E-Mail">
+                    <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="{{ __('E-mail') }}">
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
 
                 <div class="form-group has-feedback">
-                    <input type="password" class="form-control" placeholder="Password" name="password"/>
+                    <input type="password" class="form-control" placeholder="{{ __('Password') }}" name="password"/>
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
 
@@ -45,18 +45,18 @@
                     <div class="col-xs-8">
                         <div class="checkbox icheck">
                             <label>
-                                <input type="checkbox" name="remember"> Remember Me
+                                <input type="checkbox" name="remember"> {{ __('Remember me') }}
                             </label>
                         </div>
                     </div><!-- /.col -->
                     <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">{{ __('Sign in') }}</button>
                     </div><!-- /.col -->
                 </div>
             </form>
 
             {{-- [php82] mot de passe oublié : lien à usage unique envoyé par mail (Auth\PasswordResetController) --}}
-            <a href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+            <a href="{{ route('password.request') }}">{{ __('Forgot your password?') }}</a>
             {{-- [multimod] inscription libre fermée --}}
 
         </div><!-- /.login-box-body -->

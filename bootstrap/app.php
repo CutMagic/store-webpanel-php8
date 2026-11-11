@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         // visiteur non connecté sur /webpanel -> /login ; admin déjà connecté sur /login -> tableau de bord
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class); // [multimod] anti clickjacking, nosniff
+        $middleware->web(append: [\App\Http\Middleware\SetLocale::class]); // [multimod] langue FR / EN
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('webpanel.dashboard'));
     })

@@ -68,4 +68,20 @@ return [
     'items_refundfee' => env('UP_ITEMS_REFUNDFEE', 0.8),
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | [multimod] Page "Joueurs" (classement et profils des autres joueurs)
+    |--------------------------------------------------------------------------
+    |
+    | player_profiles : true = les joueurs connectés voient le classement et le profil des autres
+    |                   joueurs (SteamID, objets possédés et équipés), en lecture seule.
+    | player_profiles_credits : true = crédits et rang des autres joueurs visibles
+    |                   (false = liste par pseudo, sans crédits ni rang).
+    |
+    */
+
+    'player_profiles' => env('USERPANEL_PLAYER_PROFILES', true),
+    'player_profiles_credits' => env('USERPANEL_PLAYER_PROFILES_CREDITS', true),
+
+
 ];

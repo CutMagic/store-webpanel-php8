@@ -17,4 +17,4 @@
 <div class="pull-right hidden-xs">
     <b>Version</b> 2.0.1
 </div>
-Copyright &copy; 2013-2016  Store Plugin: <strong>Alon Gubkin</strong>, <strong>Keith Warren (Drixevel)</strong> - &copy; 2015-2016 WebPanel2: <strong>Werner Maisl</strong>. All rights reserved.
+Copyright &copy; 2013-2016  Store Plugin: <strong>Alon Gubkin</strong>, <strong>Keith Warren (Drixevel)</strong> - &copy; 2015-2016 WebPanel2: <strong>Werner Maisl</strong>. {{ __('All rights reserved.') }}

@@ -15,7 +15,7 @@
 {{--You should have received a copy of the GNU Affero General Public License--}}
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
 <!DOCTYPE html>
-<html>
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <title>WP2 | @yield('title')</title>
@@ -37,6 +37,8 @@
     <![endif]-->
 </head>
 <body class="@yield('body-class')">
+<style>.lang-switch{position:absolute;top:12px;right:16px;font-size:15px;color:#333}.lang-switch .sep{color:#888;margin:0 4px}</style>
+@include('templates.adminlte205.includes.langswitch', ['style' => 'plain'])
 
 {{-- [php82] message de confirmation (mot de passe oublié) --}}
 @if (session('status'))
@@ -44,7 +46,7 @@
 @endif
 @if (count($errors) > 0)
     <div class="alert alert-danger">
-        <strong>Erreur :</strong><br><br>
+        <strong>{{ __('Error:') }}</strong><br><br>
         <ul>
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>

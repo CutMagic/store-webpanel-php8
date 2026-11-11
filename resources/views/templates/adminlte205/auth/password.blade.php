@@ -1,7 +1,7 @@
 {{-- [php82] Mot de passe oublié (comptes admin) : demande du lien par mail --}}
 @extends('templates.adminlte205.auth.app')
 
-@section('title', 'Mot de passe oublié')
+@section('title', __('Forgot password'))
 
 @section('body-class', 'login-page')
 
@@ -11,25 +11,25 @@
             <a href="{{ url('/') }}"><b>Store</b>WebPanel</a>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
-            <p class="login-box-msg">Mot de passe oublié ? Indique l'adresse e-mail de ton compte admin : tu recevras un lien pour en choisir un nouveau.</p>
+            <p class="login-box-msg">{{ __('Forgot your password? Enter the e-mail address of your admin account: you will receive a link to choose a new one.') }}</p>
 
             <form method="POST" action="{{ route('password.email') }}">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                 <div class="form-group has-feedback">
-                    <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="E-mail" required>
+                    <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="{{ __('E-mail') }}" required>
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
 
                 <div class="row">
                     <div class="col-xs-12">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat">Envoyer le lien</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">{{ __('Send the link') }}</button>
                     </div>
                 </div>
             </form>
 
             <br>
-            <a href="{{ route('login') }}">Retour à la connexion</a>
+            <a href="{{ route('login') }}">{{ __('Back to sign in') }}</a>
         </div><!-- /.login-box-body -->
     </div><!-- /.login-box -->
 @stop

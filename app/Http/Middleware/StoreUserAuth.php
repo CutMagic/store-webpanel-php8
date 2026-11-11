@@ -35,6 +35,6 @@ class StoreUserAuth
         }
 
         return redirect()->route('userpanel.auth.index')
-            ->withErrors(['Connecte-toi pour utiliser l\'espace joueur.']);
+            ->withErrors([__('Sign in to use the player area.')]);
     }
 }

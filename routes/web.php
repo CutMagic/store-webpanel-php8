@@ -22,9 +22,13 @@ use App\Http\Controllers\UserPanel\AuthController as UserAuthController;
 use App\Http\Controllers\UserPanel\DashboardController as UserDashboardController;
 use App\Http\Controllers\UserPanel\UserItemsController;
 use App\Http\Controllers\UserPanel\LoadoutController;
+use App\Http\Controllers\UserPanel\PlayersController;
 use App\Http\Controllers\UserPanel\SteamImageController;
 
 Route::get('/', [WelcomeController::class, 'index']);
+
+// [multimod] bouton de langue FR / EN
+Route::get('lang/{locale}', [\App\Http\Controllers\LocaleController::class, 'switch'])->where('locale', 'fr|en')->name('lang.switch');
 Route::get('home', [HomeController::class, 'index'])->middleware('auth');
 
 // Installateur (seulement tant que le fichier INSTALLED n'existe pas)
@@ -124,6 +128,12 @@ Route::prefix('userpanel')->name('userpanel.')->group(function () {
             Route::get('', [LoadoutController::class, 'getIndex'])->name('index');
             Route::post('{loadout}/equip/{item_id}', [LoadoutController::class, 'postEquip'])->name('equip');
             Route::post('{loadout}/unequip/{item_id}', [LoadoutController::class, 'postUnequip'])->name('unequip');
+        });
+
+        // [multimod] classement et profils des autres joueurs (lecture seule)
+        Route::prefix('players')->name('players.')->group(function () {
+            Route::get('', [PlayersController::class, 'getIndex'])->name('index');
+            Route::get('{id}', [PlayersController::class, 'getShow'])->where('id', '[0-9]{1,10}')->name('show');
         });
     });
 

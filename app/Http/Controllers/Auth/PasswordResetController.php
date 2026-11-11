@@ -20,8 +20,9 @@ use Illuminate\Support\Str;
  */
 class PasswordResetController extends Controller
 {
-    private const SENT = 'Si cette adresse correspond à un compte admin, un mail avec un lien vient de lui être envoyé. '
-        . 'Pense à regarder dans les spams.';
+    // [multimod] texte anglais = clé de traduction (français dans lang/fr.json)
+    private const SENT = 'If this address belongs to an admin account, an e-mail with a link has just been sent to it. '
+        . 'Remember to check your spam folder.';
 
     public function showLinkRequestForm()
     {
@@ -45,7 +46,7 @@ class PasswordResetController extends Controller
             }
         });
 
-        return back()->with('status', self::SENT);
+        return back()->with('status', __(self::SENT));
     }
 
     public function showResetForm($token)
@@ -60,9 +61,9 @@ class PasswordResetController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'required|string|min:8|max:255|confirmed',
         ], [
-            'email.email' => 'Adresse e-mail invalide.',
-            'password.min' => 'Le mot de passe doit faire au moins 8 caractères.',
-            'password.confirmed' => 'Les deux mots de passe ne sont pas identiques.',
+            'email.email' => __('Invalid e-mail address.'),
+            'password.min' => __('The password must be at least 8 characters long.'),
+            'password.confirmed' => __('The two passwords do not match.'),
         ]);
 
         $userId = null;
@@ -75,12 +76,11 @@ class PasswordResetController extends Controller
 
         if ($status === Password::PASSWORD_RESET) {
             Log::info('Mot de passe oublié : mot de passe changé pour le compte admin #' . $userId);
-            return redirect()->route('login')->with('status', 'Mot de passe changé. Tu peux te connecter.');
+            return redirect()->route('login')->with('status', __('Password changed. You can sign in.'));
         }
 
         // jeton faux, expiré, déjà utilisé, ou e-mail qui ne va pas avec ce lien : même message
         return back()->withInput($request->only('email'))
-            ->withErrors(['email' => 'Ce lien n\'est pas valable (déjà utilisé, expiré, ou adresse différente de celle du compte). '
-                . 'Refais une demande.']);
+            ->withErrors(['email' => __('This link is not valid (already used, expired, or a different address from the account). Please make a new request.')]);
     }
 }

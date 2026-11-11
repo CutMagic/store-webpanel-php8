@@ -18,12 +18,15 @@
 <aside class="main-sidebar">
     <section class="sidebar">
         <ul class="sidebar-menu">
-            <li class="header">MON STORE</li>
-            <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> <span>Tableau de bord</span></a></li>
-            <li><a href="{{URL::route('userpanel.useritems.index')}}"><i class="fa fa-cubes"></i> <span>Mes objets</span></a></li>
-            <li><a href="{{URL::route('userpanel.useritems.buyoverview')}}"><i class="fa fa-shopping-cart"></i> <span>Boutique</span></a></li>
-            <li><a href="{{URL::route('userpanel.loadouts.index')}}"><i class="fa fa-check-square-o"></i> <span>Objets équipés</span></a></li>
-            <li><a href="{{URL::route('userpanel.auth.logout')}}"><i class="fa fa-sign-out"></i> <span>Déconnexion</span></a></li>
+            <li class="header">{{ __('MY STORE') }}</li>
+            <li><a href="{{URL::route('userpanel.dashboard')}}"><i class="fa fa-dashboard"></i> <span>{{ __('Dashboard') }}</span></a></li>
+            <li><a href="{{URL::route('userpanel.useritems.index')}}"><i class="fa fa-cubes"></i> <span>{{ __('My items') }}</span></a></li>
+            <li><a href="{{URL::route('userpanel.useritems.buyoverview')}}"><i class="fa fa-shopping-cart"></i> <span>{{ __('Shop') }}</span></a></li>
+            <li><a href="{{URL::route('userpanel.loadouts.index')}}"><i class="fa fa-check-square-o"></i> <span>{{ __('Equipped items') }}</span></a></li>
+            @if (config('userpanel.player_profiles'))
+                <li><a href="{{URL::route('userpanel.players.index')}}"><i class="fa fa-users"></i> <span>{{ __('Players') }}</span></a></li>
+            @endif
+            <li><a href="{{URL::route('userpanel.auth.logout')}}"><i class="fa fa-sign-out"></i> <span>{{ __('Log out') }}</span></a></li>
         </ul>
     </section>
 </aside>

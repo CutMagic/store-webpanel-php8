@@ -16,19 +16,19 @@
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
 @extends('templates.adminlte205.auth.app')
 
-@section('title', 'User Login')
+@section('title', __('Player login'))
 
 @section('body-class', 'login-page')
 
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a href="../../index2.html"><b>Store</b>UserPanel</a>
+            <a href="{{ url('/') }}"><b>Store</b>UserPanel</a>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
-            <p class="login-box-msg">Sign in to start your session</p>
+            <p class="login-box-msg">{{ __('Sign in with your Steam account to see your credits and items.') }}</p>
 
-            <a href="{{ \App\Support\SteamOpenId::url(URL::route('userpanel.auth.steamlogin')) }}">Login via Steam!</a>
+            <a href="{{ \App\Support\SteamOpenId::url(URL::route('userpanel.auth.steamlogin')) }}" class="btn btn-primary btn-block btn-flat"><i class="fa fa-steam"></i> {{ __('Sign in through Steam') }}</a>
 
         </div><!-- /.login-box-body -->
     </div><!-- /.login-box -->

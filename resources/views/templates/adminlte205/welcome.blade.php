@@ -14,72 +14,88 @@
 
 {{--You should have received a copy of the GNU Affero General Public License--}}
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
-
-<html>
+{{-- [multimod] page d'accueil lisible (texte foncé, vrais boutons) et bouton de langue FR / EN --}}
+<!DOCTYPE html>
+<html lang="{{ app()->getLocale() }}">
 <head>
-    <title>StoreWebPanel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Store WebPanel</title>
 
-    <link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <style>
         body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            color: #B0BEC5;
-            display: table;
-            font-weight: 100;
-            font-family: 'Lato';
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding: 56px 16px 24px; /* le haut reste libre pour le bouton de langue */
+            background: #f4f6f8;
+            color: #1f2933;
+            font-family: 'Lato', 'Segoe UI', Arial, sans-serif;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .container {
-            text-align: center;
-            display: table-cell;
-            vertical-align: middle;
-        }
-
-        .content {
-            text-align: center;
-            display: inline-block;
-        }
-
+        .content { text-align: center; max-width: 760px; }
         .title {
-            font-size: 96px;
-            margin-bottom: 40px;
+            font-size: 64px;
+            font-weight: 300;
+            color: #111;
+            margin: 0 0 12px;
+            line-height: 1.1;
         }
-
         .subtitle {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 36px;
         }
-
-        .link {
-            font-size: 16px;
-            margin-bottom: 10px;
+        .buttons a {
+            display: inline-block;
+            margin: 6px 8px;
+            padding: 14px 28px;
+            border-radius: 4px;
+            background: #3c8dbc;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
         }
-
-        .footer-first {
-            font-size: 12px;
-            margin-bottom: 10px;
-            margin-top: 30px;
-        }
-
+        .buttons a:hover, .buttons a:focus { background: #2f6f95; }
+        .buttons a.secondary { background: #222d32; }
+        .buttons a.secondary:hover, .buttons a.secondary:focus { background: #111; }
         .footer {
-            font-size: 12px;
-            margin-bottom: 10px;
+            margin-top: 40px;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.8;
         }
+        .lang-switch {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            font-size: 15px;
+            color: #333;
+        }
+        .lang-switch a { color: #1a5a85; }
+        .lang-switch .sep { color: #888; margin: 0 4px; }
+        @media (max-width: 600px) { .title { font-size: 40px; } .subtitle { font-size: 18px; } }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="content">
-        <div class="title">Store WebPanel 2</div>
-        <div class="subtitle">A glimpse to the future of the Store Plugin</div>
-        <div class="link"><a href="{{URL::route("webpanel.dashboard")}}">Proceed to the Admin Interface</a></div>
-        <div class="link"><a href="{{URL::route("userpanel.dashboard")}}">Proceed to the User Interface</a></div>
-        <div class="footer-first">Store Webpanel 2 - &copy; 2015-2016 by Werner Maisl</div>
-        <div class="footer">Store Plugin - &copy; 2013-2016 Alon Gubkin, Keith Warren (Drixevel)</div>
+@include('templates.adminlte205.includes.langswitch', ['style' => 'plain'])
+<div class="content">
+    <h1 class="title">Store WebPanel</h1>
+    <div class="subtitle">{{ __('Web panel of the SourceMod Store plugin') }}</div>
+    <div class="buttons">
+        <a href="{{ URL::route('userpanel.dashboard') }}"><i class="fa fa-user"></i> {{ __('Player area') }}</a>
+        <a href="{{ URL::route('webpanel.dashboard') }}" class="secondary"><i class="fa fa-lock"></i> {{ __('Admin area') }}</a>
+    </div>
+    <div class="footer">
+        Store Webpanel 2 - &copy; 2015-2016 Werner Maisl<br>
+        Store Plugin - &copy; 2013-2016 Alon Gubkin, Keith Warren (Drixevel)
     </div>
 </div>
 </body>
