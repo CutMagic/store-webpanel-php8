@@ -1,0 +1,34 @@
+# ============================================================================
+# Store WebPanel - .htaccess de la RACINE du panneau (Apache / LiteSpeed)
+#
+# Sert quand tout le dossier du panneau est dans le dossier web (ex. public_html/store).
+# Le mieux reste de faire pointer le (sous-)domaine directement sur le dossier "public" :
+# dans ce cas ce fichier n'est pas utilisé.
+#
+# !!! Si tu modifies ce fichier, GARDE LA PARTIE 1 (protection des fichiers sensibles).
+# !!! Sans elle, ton .env (mots de passe MySQL et SMTP) peut être lisible par tout le monde.
+# !!! A la fin de l'installation, /installer vérifie que .env n'est pas lisible.
+# ============================================================================
+
+# 1. PROTECTION : fichiers cachés (.env, .git...) et fichiers du projet jamais servis.
+#    Volontairement HORS du bloc mod_rewrite : elle marche même si mod_rewrite est absent.
+RedirectMatch 404 (?i)/\.(?!well-known/)
+RedirectMatch 404 (?i)/(composer\.(json|lock)|package\.json|artisan|INSTALLED|vite\.config\.js)$
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1 bis. dossiers internes du panneau (chemins comptés depuis ce dossier) : 404
+    RewriteRule ^(app|bootstrap|config|database|lang|resources|routes|storage|tests|vendor)(/|$) - [R=404,L]
+
+    # en-tête utilisé par Laravel
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # 2. Tout le reste est envoyé, sans changer l'adresse, vers le dossier public
+    #    (marche à la racine du domaine comme dans un sous-dossier : /store/...)
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>
+
+# 3. Si mod_rewrite est absent : index.php de la racine envoie vers public/
+DirectoryIndex index.php

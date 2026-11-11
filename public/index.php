@@ -5,6 +5,9 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// [php82] adresses correctes via le .htaccess de la racine + .env/clé créés à la première visite
+require __DIR__.'/../bootstrap/webpanel-prepare.php';
+
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;

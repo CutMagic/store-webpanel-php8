@@ -57,7 +57,7 @@
         </div>
         <div class="form-group">
             {!! Form::label('db_password_panel', 'Webpanel Database Password') !!}
-            {!! Form::text('db_password_panel', null, ['class' => 'form-control']) !!}
+            {!! Form::password('db_password_panel', ['class' => 'form-control', 'autocomplete' => 'new-password']) !!}
         </div>
 
         <div class="alert alert-info" role="alert">
@@ -81,7 +81,7 @@
         </div>
         <div class="form-group">
             {!! Form::label('db_password_store', 'Store Database Password') !!}
-            {!! Form::text('db_password_store', null, ['class' => 'form-control']) !!}
+            {!! Form::password('db_password_store', ['class' => 'form-control', 'autocomplete' => 'new-password']) !!}
         </div>
 
         <div class="alert alert-info" role="alert">
@@ -138,8 +138,8 @@
             {!! Form::text('mail_username', null, ['class' => 'form-control']) !!}
         </div>
         <div class="form-group">
-            {!! Form::label('mail_password', 'Session Driver') !!}
-            {!! Form::text('mail_password', null, ['class' => 'form-control']) !!}
+            {!! Form::label('mail_password', 'Mail Password') !!}
+            {!! Form::password('mail_password', ['class' => 'form-control', 'autocomplete' => 'new-password']) !!}
         </div>
     </div>
     <div class="bottom-container">

@@ -22,6 +22,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ExposureCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
@@ -51,9 +52,12 @@ class InstallerController extends Controller
             'APP_NAME' => 'Store',
             'APP_ENV' => 'production',
             'APP_DEBUG' => 'false',
-            'APP_KEY' => 'base64:' . base64_encode(random_bytes(32)),
+            // [php82] garde la clé créée à la première visite (sinon la session en cours serait perdue)
+            'APP_KEY' => config('app.key') ?: 'base64:' . base64_encode(random_bytes(32)),
             'APP_URL' => $request->getSchemeAndHttpHost() . $request->getBasePath(),
             'APP_LOCALE' => 'fr',
+            // [php82] cookies de session réservés au https si le site est en https
+            'SESSION_SECURE_COOKIE' => $request->isSecure() ? 'true' : 'false',
 
             'DB_CONNECTION' => 'webpanel',
             'DB_HOST_PANEL' => $hostPanel,
@@ -105,11 +109,15 @@ class InstallerController extends Controller
         return view('templates.installer.fillresult', compact('output'));
     }
 
-    public function showFinish()
+    public function showFinish(Request $request)
     {
+        // [php82] le contrôle de sécurité ne tourne qu'une fois : au moment où l'installation se termine
+        $justInstalled = !file_exists(base_path('INSTALLED'));
         file_put_contents(base_path('INSTALLED'), 'INSTALLED');
 
-        return view('templates.installer.finish');
+        $checks = $justInstalled ? ExposureCheck::run(ExposureCheck::rootUrl($request)) : null;
+
+        return view('templates.installer.finish', compact('checks'));
     }
 
     /** "hote:port" ou "hote" -> [hote, port] */
