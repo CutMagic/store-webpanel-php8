@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -28,15 +29,15 @@
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('name', 'Name') !!}
+                    {!! Form::label('name', __('Name')) !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('display_name', 'Display Name') !!}
+                    {!! Form::label('display_name', __('Display Name')) !!}
                     {!! Form::text('display_name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('description', 'Description') !!}
+                    {!! Form::label('description', __('Description')) !!}
                     {!! Form::text('description', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="box-footer">
@@ -49,10 +50,10 @@
     <div class="col-md-6">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">Roles</h3>
+                <h3 class="box-title">{{ __('Roles') }}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
-                {!! Form::label('role_list', 'Roles') !!}
+                {!! Form::label('role_list', __('Roles')) !!}
                 {!! Form::select('role_list[]', $roles, $current_roles,['id' => 'role_list','class' => 'form-control','multiple']) !!}
             </div><!-- /.box-body -->
         </div><!-- /.box -->
@@ -64,7 +65,7 @@
 
     <script>
         $('#role_list').select2({
-            placeholder: 'Select Roles'
+            placeholder: {!! json_encode(__('Select Roles')) !!}
         });
     </script>
 @endsection

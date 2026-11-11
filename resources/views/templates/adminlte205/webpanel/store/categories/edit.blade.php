@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Categories')
+@section('title', __('Categories'))
 
-@section('subtitle', 'Edit')
+@section('subtitle', __('Edit'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Categories</li>
-    <li class="active">Edit</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Categories') }}</li>
+    <li class="active">{{ __('Edit') }}</li>
 @stop
 
 @section('content')
     {!! Form::model($category,['method' => 'PATCH','route' => ['webpanel.store.categories.update',$category->id]]) !!}
-    @include('templates.adminlte205.webpanel.store.categories._form',['LeftMenuTitle'=>'Edit Category: '.$category->display_name,'SubmitButtonText' => 'Edit Category'])
+    @include('templates.adminlte205.webpanel.store.categories._form',['LeftMenuTitle' => __('Edit Category: :name', ['name' => $category->display_name]),'SubmitButtonText' => __('Edit Category')])
     {!! Form::close() !!}
 @stop

@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,14 +18,14 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Categories')
+@section('title', __('Categories'))
 
-@section('subtitle', 'Overview')
+@section('subtitle', __('Overview'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Categories</li>
-    <li class="active">Overview</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Categories') }}</li>
+    <li class="active">{{ __('Overview') }}</li>
 @stop
 
 @section('content')
@@ -32,17 +33,17 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">All Categories</h3>
+                    <h3 class="box-title">{{ __('All Categories') }}</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <table class="table table-bordered table-striped" id="table">
                         <thead>
                             <tr>
                                 <th style="width: 10px">#</th>
-                                <th>Priority</th>
-                                <th>Name</th>
-                                <th>Require Plugin</th>
-                                <th>Actions</th>
+                                <th>{{ __('Priority') }}</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('Require Plugin') }}</th>
+                                <th>{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                     </table>
@@ -63,6 +64,7 @@
             $('#table').DataTable({
                 processing: true,
                 serverSide: true,
+                language: @include('templates.adminlte205.includes.dtlang'),
                 ajax: '{{ route("webpanel.store.categories.data") }}',
                 columns: [
                     {data: 'id', name: 'id'},

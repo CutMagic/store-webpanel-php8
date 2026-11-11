@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -28,17 +29,17 @@
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('name', 'User Name') !!}
+                    {!! Form::label('name', __('User Name')) !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('email', 'E-Mail') !!}
+                    {!! Form::label('email', __('E-Mail')) !!}
                     {!! Form::text('email', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('password', 'Password') !!}
+                    {!! Form::label('password', __('Password')) !!}
                     {!! Form::password('password', ['class' => 'form-control', 'autocomplete' => 'new-password']) !!}
-                    <p class="help-block">8 caractères minimum. En modification : laisser vide pour garder le mot de passe actuel.</p> {{-- [multimod] avant : champ texte pré-rempli avec le hachage --}}
+                    <p class="help-block">{{ __('At least 8 characters. When editing: leave empty to keep the current password.') }}</p> {{-- [multimod] avant : champ texte pré-rempli avec le hachage --}}
                 </div>
                 <div class="box-footer">
                     {!! Form::submit($SubmitButtonText, ['class' => 'btn btn-primary']) !!}
@@ -50,11 +51,11 @@
     <div class="col-md-6">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">User Roles</h3>
+                <h3 class="box-title">{{ __('User Roles') }}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('role_list', 'Roles') !!}
+                    {!! Form::label('role_list', __('Roles')) !!}
                     {!! Form::select('role_list[]', $roles, $current_roles,['id' => 'role_list','class' => 'form-control','multiple']) !!}
                 </div>
             </div><!-- /.box-body -->
@@ -68,7 +69,7 @@
 
     <script>
         $('#role_list').select2({
-            placeholder: 'Select Roles'
+            placeholder: {!! json_encode(__('Select Roles')) !!}
         });
     </script>
 @endsection

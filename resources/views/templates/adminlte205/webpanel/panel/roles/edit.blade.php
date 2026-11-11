@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Roles')
+@section('title', __('Roles'))
 
-@section('subtitle', 'Edit')
+@section('subtitle', __('Edit'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Roles</li>
-    <li class="active">Edit</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Roles') }}</li>
+    <li class="active">{{ __('Edit') }}</li>
 @stop
 
 @section('content')
     {!! Form::model($role,['method' => 'PATCH','route' => ['webpanel.panel.roles.update',$role->id]]) !!}
-    @include('templates.adminlte205.webpanel.panel.roles._form',['LeftMenuTitle'=>'Edit Role '.$role->display_name,'SubmitButtonText' => 'Edit Role'])
+    @include('templates.adminlte205.webpanel.panel.roles._form',['LeftMenuTitle' => __('Edit Role :name', ['name' => $role->display_name]),'SubmitButtonText' => __('Edit Role')])
     {!! Form::close() !!}
 @stop

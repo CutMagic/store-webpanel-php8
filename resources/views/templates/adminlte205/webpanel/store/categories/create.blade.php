@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Categories')
+@section('title', __('Categories'))
 
-@section('subtitle', 'Create')
+@section('subtitle', __('Create'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Categories</li>
-    <li class="active">Create</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Categories') }}</li>
+    <li class="active">{{ __('Create') }}</li>
 @stop
 
 @section('content')
     {!! Form::open(['route' => 'webpanel.store.categories.store']) !!}
-        @include('templates.adminlte205.webpanel.store.categories._form',['LeftMenuTitle'=>'Create a new Category','SubmitButtonText' => 'Create Category'])
+        @include('templates.adminlte205.webpanel.store.categories._form',['LeftMenuTitle' => __('Create a new Category'),'SubmitButtonText' => __('Create Category')])
     {!! Form::close() !!}
 @stop

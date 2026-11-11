@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,14 +18,14 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Servers')
+@section('title', __('Servers'))
 
-@section('subtitle', 'Overview')
+@section('subtitle', __('Overview'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Servers</li>
-    <li class="active">Overview</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Servers') }}</li>
+    <li class="active">{{ __('Overview') }}</li>
 @stop
 
 @section('content')
@@ -32,17 +33,17 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">All Servers</h3>
+                    <h3 class="box-title">{{ __('All Servers') }}</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <table class="table table-bordered">
                         <tr>
                             <th style="width: 10px">#</th>
-                            <th>Name</th>
-                            <th>Display Name</th>
-                            <th>IP</th>
-                            <th>Port</th>
-                            <th>Actions</th>
+                            <th>{{ __('Name') }}</th>
+                            <th>{{ __('Display Name') }}</th>
+                            <th>{{ __('IP') }}</th>
+                            <th>{{ __('Port') }}</th>
+                            <th>{{ __('Actions') }}</th>
                         </tr>
                         @foreach($servers as $server)
                             <tr>
@@ -55,12 +56,12 @@
                                     <div>
                                         <div style="float: right">
                                             {!! Form::open(['method' => 'DELETE', 'url' => route('webpanel.store.servers.destroy',$server->id)]) !!}
-                                            {!! Form::submit('Remove',['class' => 'btn btn-danger']) !!}
+                                            {!! Form::submit(__('Remove'),['class' => 'btn btn-danger']) !!}
                                             {!! Form::close() !!}
                                         </div>
                                         <div style="float: right">
                                             {!! Form::open(['method' => 'GET', 'url' => route('webpanel.store.servers.edit',$server->id)]) !!}
-                                            {!! Form::submit('Edit',['class' => 'btn btn-danger']) !!}
+                                            {!! Form::submit(__('Edit'),['class' => 'btn btn-warning']) !!}
                                             {!! Form::close() !!}
                                         </div>
                                     </div>

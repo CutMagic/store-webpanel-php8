@@ -5,7 +5,7 @@ Web panel for the SourceMod "Store 1.2 Final" plugin (Drixevel), Counter-Strike:
 Admin panel (items, categories, players and credits, servers, admin roles) and player area
 (credits, inventory, shop, equipped items) with Steam login.
 Based on SourceMod-Store WebPanel-Core 2.0.1 (Werner Maisl, AGPLv3), ported to Laravel 12 / PHP 8.2.
-Fixed security issues: see SECURITY-FIXES.txt.
+Fixed security issues: see SECURITY-FIXES.txt. French version of this file: INSTALL-FR.txt.
 
 
 REQUIREMENTS
@@ -106,8 +106,9 @@ GOOD TO KNOW
 - Store 1.2 tables are MyISAM (no transactions): every credit change is a single atomic query,
   like in the plugin.
 - The "store" database connection uses latin1, like the plugin, so player names look the same as in game.
-- Home page, login pages and player area: French or English (FR / EN button, remembered for one year;
-  default language: APP_LOCALE in .env). The admin panel itself is in English.
+- The whole site (home page, login pages, player area and admin panel) is in French or English:
+  FR / EN button, remembered for one year; default language: APP_LOCALE in .env. French texts are in
+  lang/fr.json (the English text in the code is the key).
 - "Players" page (player area): ranking by credits, search by name or SteamID (STEAM_0:..., [U:1:...],
   SteamID64, Steam profile link) and each player's profile (SteamIDs, link to the Steam profile, owned
   and equipped items), read-only, for signed-in players only. In .env: USERPANEL_PLAYER_PROFILES=false

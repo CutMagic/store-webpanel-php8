@@ -5,6 +5,7 @@ administration du store (objets, catégories, joueurs, crédits, serveurs) et **
 connexion Steam (crédits, inventaire, boutique, objets équipés).
 
 > **English:** installation instructions are in [INSTALL.txt](INSTALL.txt).
+> Instructions d'installation en français : [INSTALL-FR.txt](INSTALL-FR.txt).
 > Fixed security issues (FR/EN): [SECURITY-FIXES.txt](SECURITY-FIXES.txt).
 
 Basé sur [SourceMod-Store WebPanel-Core](https://github.com/SourceMod-Store/WebPanel-Core) 2.0.1
@@ -22,8 +23,8 @@ Liste des failles corrigées : [SECURITY-FIXES.txt](SECURITY-FIXES.txt).
   SteamID64, lien du profil Steam), profil de chaque joueur avec ses SteamID, le lien vers son profil
   Steam et ses objets possédés et équipés (lecture seule, joueurs connectés seulement). Réglages `.env` :
   `USERPANEL_PLAYER_PROFILES` (page entière) et `USERPANEL_PLAYER_PROFILES_CREDITS` (crédits des autres).
-- **Français / anglais** : bouton FR / EN sur l'accueil, les pages de connexion et l'espace joueur
-  (langue par défaut : `APP_LOCALE`). Le panneau d'administration reste en anglais.
+- **Français / anglais** : bouton FR / EN sur tout le site (accueil, connexion, espace joueur et panneau
+  d'administration). Langue par défaut : `APP_LOCALE`. Textes français dans `lang/fr.json`.
 - **Connexion joueur par Steam OpenID** : pas besoin de clé API Steam.
 - **Deux bases** (ou une seule) : la base du **panneau** (tables `webpanel_*`, comptes admin, rôles,
   serveurs) et la base du **store** (tables `store_*` du plugin). Le panneau lit et modifie les données

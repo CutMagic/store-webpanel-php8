@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -18,12 +19,12 @@
 <div>
     <div style="float: right">
         {!! Form::open(['method' => 'DELETE', 'url' => route('webpanel.store.items.destroy',$item->id)]) !!}
-        {!! Form::submit('Remove ' . $item->id,['class' => 'btn btn-danger']) !!}
+        {!! Form::submit(__('Remove #:id', ['id' => $item->id]),['class' => 'btn btn-danger']) !!}
         {!! Form::close() !!}
     </div>
     <div style="float: right">
         {!! Form::open(['method' => 'GET', 'url' => route('webpanel.store.items.edit',$item->id)]) !!}
-        {!! Form::submit('Edit ' . $item->id,['class' => 'btn btn-warning']) !!}
+        {!! Form::submit(__('Edit #:id', ['id' => $item->id]),['class' => 'btn btn-warning']) !!}
         {!! Form::close() !!}
     </div>
 </div>

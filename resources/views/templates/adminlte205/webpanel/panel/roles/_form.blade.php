@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -29,15 +30,15 @@
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('name', 'Name') !!}
+                    {!! Form::label('name', __('Name')) !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('display_name', 'Display Name') !!}
+                    {!! Form::label('display_name', __('Display Name')) !!}
                     {!! Form::text('display_name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('description', 'Description') !!}
+                    {!! Form::label('description', __('Description')) !!}
                     {!! Form::text('description', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="box-footer">
@@ -50,10 +51,10 @@
     <div class="col-md-6">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">Permissions</h3>
+                <h3 class="box-title">{{ __('Permissions') }}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
-                {!! Form::label('permission_list', 'Permissions') !!}
+                {!! Form::label('permission_list', __('Permissions')) !!}
                 {!! Form::select('permission_list[]', $permissions, $current_permissions,['id' => 'permission_list','class' => 'form-control','multiple']) !!}
             </div><!-- /.box-body -->
         </div><!-- /.box -->
@@ -65,7 +66,7 @@
 
     <script>
         $('#permission_list').select2({
-            placeholder: 'Select Permissions'
+            placeholder: {!! json_encode(__('Select Permissions')) !!}
         });
     </script>
 @endsection

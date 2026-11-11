@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -36,7 +37,7 @@
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('priority', 'Priority') !!}
+                    {!! Form::label('priority', __('Priority')) !!}
                     <div class="row margin">
                         <div class="col-sm-12">
                             {!! Form::text('priority') !!}
@@ -44,23 +45,23 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    {!! Form::label('display_name', 'Display Name') !!}
+                    {!! Form::label('display_name', __('Display Name')) !!}
                     {!! Form::text('display_name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('description', 'Description') !!}
+                    {!! Form::label('description', __('Description')) !!}
                     {!! Form::text('description', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('require_plugin', 'Require Plugin') !!}
+                    {!! Form::label('require_plugin', __('Require Plugin')) !!}
                     {!! Form::text('require_plugin', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('web_description', 'Web Description') !!}
+                    {!! Form::label('web_description', __('Web Description')) !!}
                     {!! Form::text('web_description', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('web_color', 'Web Color') !!}
+                    {!! Form::label('web_color', __('Web Color')) !!}
                     {!! Form::text('web_color', null, ['class' => 'form-control my-colorpicker1']) !!}
                 </div>
             </div><!-- /.box-body -->
@@ -72,32 +73,32 @@
     <div class="col-md-6">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">Server Restrictions</h3>
+                <h3 class="box-title">{{ __('Server Restrictions') }}</h3>
             </div>
             <div class="box-body">
                 <div class="panel box box-primary">
                     <div class="box-header with-border">
                         <h4 class="box-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                Setting up Server Restrictions
+                                {{ __('Setting up server restrictions') }}
                             </a>
                         </h4>
                     </div>
                     <div id="collapseOne" class="panel-collapse collapse">
                         <div class="box-body">
-                            If you would like to restrict a category to a specific server, then you have to enable server restrictions for that category by checking the checkbox "Enable Server Restrictions"
+                            {{ __('To limit this category to some servers, tick "Enable Server Restriction".') }}
                             <br>
-                            Once you have done that, you have to enter your servers below.
+                            {{ __('Then choose the servers below.') }}
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     {!! Form::hidden('enable_server_restriction',0) !!}
                     {!! Form::checkbox('enable_server_restriction') !!}
-                    {!! Form::label('enable_server_restriction', 'Enable Server Restriction') !!}
+                    {!! Form::label('enable_server_restriction', __('Enable Server Restriction')) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('server_list', 'Servers') !!}
+                    {!! Form::label('server_list', __('Servers')) !!}
                     {!! Form::select('server_list[]', $servers, $current_servers,['id' => 'server_list','class' => 'form-control','multiple']) !!}
                 </div>
             </div>
@@ -117,7 +118,7 @@
 
     <script>
         $('#server_list').select2({
-            placeholder: 'Select a Server'
+            placeholder: {!! json_encode(__('Select a Server')) !!}
         });
         $('#web_color').colorpicker();
 

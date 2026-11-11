@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,16 +18,15 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Dashboard')
+@section('title', __('Dashboard'))
 
-@section('subtitle', 'Version 2.0')
+@section('subtitle', __('Store WebPanel'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Dashboard</li>
-    <li class="active">Empty Page</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Dashboard') }}</li>
 @stop
 
 @section('content')
-    A new Page
+    @include('templates.adminlte205.webpanel.includes.dashboard-boxes')
 @stop

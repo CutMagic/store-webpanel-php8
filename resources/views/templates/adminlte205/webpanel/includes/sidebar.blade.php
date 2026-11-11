@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -18,13 +19,13 @@
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
         <ul class="sidebar-menu">
-            <li class="header">MAIN NAVIGATION</li>
-            <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li class="header">{{ __('MAIN NAVIGATION') }}</li>
+            <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-dashboard"></i> {{ __('Dashboard') }}</a></li>
 
             <!-- Store -->
             <li class="treeview">
                 <a href="#">
-                    <i class="fa fa-briefcase"></i> <span>Store</span>
+                    <i class="fa fa-briefcase"></i> <span>{{ __('Store') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
@@ -33,12 +34,12 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-folder-open"></i>
-                            <span>Categories</span>
+                            <span>{{ __('Categories') }}</span>
                             <span class="label label-primary pull-right">{{$storeCategoryCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.store.categories.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.store.categories.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.store.categories.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.store.categories.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>
@@ -47,12 +48,12 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-files-o"></i>
-                            <span>Items</span>
+                            <span>{{ __('Items') }}</span>
                             <span class="label label-primary pull-right">{{$storeItemCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.store.items.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.store.items.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.store.items.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.store.items.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>
@@ -61,12 +62,12 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-users"></i>
-                            <span>Users</span>
+                            <span>{{ __('Users') }}</span>
                             <span class="label label-primary pull-right">{{$storeUserCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.store.users.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.store.users.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.store.users.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.store.users.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>
@@ -75,11 +76,11 @@
                     <!--<li class="treeview">
                             <a href="#">
                                 <i class="fa fa-shopping-cart"></i>
-                                <span>Loadouts</span>
+                                <span>{{ __('Loadouts') }}</span>
                             </a>
                             <ul class="treeview-menu">
-                                <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> View </a></li>  TODO: Add named route
-                                <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Create </a></li>  TODO: Add named route
+                                <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>  TODO: Add named route
+                                <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>  TODO: Add named route
                                 <li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route
                             </ul>
                         </li>-->
@@ -88,21 +89,21 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-sitemap"></i>
-                            <span>Servers</span>
+                            <span>{{ __('Servers') }}</span>
                             <span class="label label-primary pull-right">{{$storeServerCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.store.servers.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.store.servers.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.store.servers.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.store.servers.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>
 
                     <!-- Versions-->
-                    <li><a href="{{URL::route('webpanel.store.versions.index')}}"><i class="fa fa-desktop"></i> Versions</a></li>
+                    <li><a href="{{URL::route('webpanel.store.versions.index')}}"><i class="fa fa-desktop"></i> {{ __('Versions') }}</a></li>
 
                     <!-- Tools -->
-                    <li><a href="{{URL::route('webpanel.store.tools.index')}}"><i class="fa fa-wrench"></i> Tools</a></li>
+                    <li><a href="{{URL::route('webpanel.store.tools.index')}}"><i class="fa fa-wrench"></i> {{ __('Tools') }}</a></li>
 
                 </ul>
             </li>
@@ -110,7 +111,7 @@
             <!-- WebPanel -->
             <li class="treeview">
                 <a href="#">
-                    <i class="fa fa-cogs"></i> <span>WebPanel</span>
+                    <i class="fa fa-cogs"></i> <span>{{ __('WebPanel') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
@@ -119,12 +120,12 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-files-o"></i>
-                            <span>Permissions</span>
+                            <span>{{ __('Permissions') }}</span>
                             <span class="label label-primary pull-right">{{$panelPermissionCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.panel.permissions.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.panel.permissions.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.panel.permissions.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.panel.permissions.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>
@@ -133,12 +134,12 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-folder-open"></i>
-                            <span>Roles</span>
+                            <span>{{ __('Roles') }}</span>
                             <span class="label label-primary pull-right">{{$panelRoleCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.panel.roles.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.panel.roles.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.panel.roles.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.panel.roles.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>
@@ -147,12 +148,12 @@
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-users"></i>
-                            <span>Users</span>
+                            <span>{{ __('Users') }}</span>
                             <span class="label label-primary pull-right">{{$panelUserCount}}</span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{{URL::route('webpanel.panel.users.index')}}"><i class="fa fa-circle-o"></i> View </a></li>
-                            <li><a href="{{URL::route('webpanel.panel.users.create')}}"><i class="fa fa-circle-o"></i> Create </a></li>
+                            <li><a href="{{URL::route('webpanel.panel.users.index')}}"><i class="fa fa-circle-o"></i> {{ __('View') }} </a></li>
+                            <li><a href="{{URL::route('webpanel.panel.users.create')}}"><i class="fa fa-circle-o"></i> {{ __('Create') }} </a></li>
                             <!--<li><a href="{{URL::route('webpanel.dashboard')}}"><i class="fa fa-circle-o"></i> Stats</a></li>  TODO: Add named route -->
                         </ul>
                     </li>

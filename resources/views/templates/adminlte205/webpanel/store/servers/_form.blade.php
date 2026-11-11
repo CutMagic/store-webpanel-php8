@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -24,24 +25,24 @@
             <div class="box-body">
                 {{-- [multimod] numéro du serveur = server_id de la config du Store sur ce serveur de jeu --}}
                 <div class="form-group">
-                    {!! Form::label('id', 'Server ID (store server_id)') !!}
+                    {!! Form::label('id', __('Server ID (store server_id)')) !!}
                     {!! Form::text('id', null, ['class' => 'form-control']) !!}
-                    <p class="help-block">Same number as the Store "server_id" setting on that game server.</p>
+                    <p class="help-block">{{ __('Same number as the Store "server_id" setting on that game server.') }}</p>
                 </div>
                 <div class="form-group">
-                    {!! Form::label('name', 'Name') !!}
+                    {!! Form::label('name', __('Name')) !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('display_name', 'Display Name') !!}
+                    {!! Form::label('display_name', __('Display Name')) !!}
                     {!! Form::text('display_name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('ip', 'IP') !!}
+                    {!! Form::label('ip', __('IP')) !!}
                     {!! Form::text('ip', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('port', 'Port') !!}
+                    {!! Form::label('port', __('Port')) !!}
                     {!! Form::text('port', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="box-footer">

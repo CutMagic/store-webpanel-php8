@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,14 +18,14 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Versions')
+@section('title', __('Versions'))
 
-@section('subtitle', 'Overview')
+@section('subtitle', __('Overview'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Versions</li>
-    <li class="active">Overview</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Versions') }}</li>
+    <li class="active">{{ __('Overview') }}</li>
 @stop
 
 @section('content')
@@ -32,41 +33,41 @@
         <div class="col-md-12">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#tab_1" data-toggle="tab">Intro</a></li>
-                    <li><a href="#tab_2" data-toggle="tab">Version Overview</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="{{route("webpanel.store.versions.update")}}">Update Plugin Versions</a></li>
+                    <li class="active"><a href="#tab_1" data-toggle="tab">{{ __('Intro') }}</a></li>
+                    <li><a href="#tab_2" data-toggle="tab">{{ __('Version Overview') }}</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="{{route("webpanel.store.versions.update")}}">{{ __('Update plugin versions') }}</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
                         @if($private_plugins)
                             <div class="callout callout-danger">
-                                <h4>Private Plugins detected</h4>
-                                <p>You are using private plugins. Private plugins are not supported by the updater. Therefore it will not work.</p>
+                                <h4>{{ __('Private plugins detected') }}</h4>
+                                <p>{{ __('You are using private plugins. The updater does not support them, so it will not work.') }}</p>
                             </div>
                         @endif
                         @if($date_diff > 10)
                             <div class="callout callout-info">
-                                <h4>Version Data of of Date</h4>
-                                <p>The Version Data is out of date. You should click on "Update Plugin Versions" to update to check against the latest version</p>
+                                <h4>{{ __('Version data out of date') }}</h4>
+                                <p>{{ __('The version data is out of date. Click "Update plugin versions" to compare with the latest versions.') }}</p>
                             </div>
                         @endif
-                        This Page shows you the installed versions of the store modules on your servers.<br>
-                        Every once in a while you should click on the "Update Plugin Version" button to download the latest version information.<br>
-                        This is not done automatically, because it can take quite a while to download the updated version files.<br>
-                        There will be a notification if it has not been updated for 10 days.<br>
+                        {{ __('This page shows the installed versions of the store modules on your servers.') }}<br>
+                        {{ __('From time to time, click "Update plugin versions" to download the latest version information.') }}<br>
+                        {{ __('It is not done automatically because downloading the version files can take a while.') }}<br>
+                        {{ __('A warning is shown when it has not been updated for 10 days.') }}<br>
                     </div><!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_2">
                         @if(!$private_plugins)
                             <table class="table table-bordered">
                                 <tr>
                                     <th style="width: 10px">#</th>
-                                    <th>Module Name</th>
-                                    <th>Module Description</th>
-                                    <th>Installed Version</th>
-                                    <th>Current Version</th>
-                                    <th>Server ID</th>
-                                    <th>Last Updated</th>
-                                    <th>Update Status</th>
+                                    <th>{{ __('Module Name') }}</th>
+                                    <th>{{ __('Module Description') }}</th>
+                                    <th>{{ __('Installed Version') }}</th>
+                                    <th>{{ __('Current Version') }}</th>
+                                    <th>{{ __('Server ID') }}</th>
+                                    <th>{{ __('Last Updated') }}</th>
+                                    <th>{{ __('Update Status') }}</th>
                                 </tr>
                                 @foreach($plugin_versions as $version)
                                     <tr>
@@ -78,19 +79,19 @@
                                         <td>{{$version["server_id"]}}</td>
                                         <td>{{$version["mod_last_updated"]}}</td>
                                         @if($version["version"]["code"] == 0)
-                                            <td><small class="label label-success"> Up2Date</small></td>
+                                            <td><small class="label label-success">{{ __('Up to date') }}</small></td>
                                         @elseif($version["version"]["code"] >= 10 && $version["version"]["code"] <= 19)
-                                            <td><small class="label label-warning"> OutOfDate</small></td>
+                                            <td><small class="label label-warning">{{ __('Out of date') }}</small></td>
                                         @elseif($version["version"]["code"] >= 91 && $version["version"]["code"] <= 99)
-                                            <td><small class="label label-danger"> Error</small></td>
+                                            <td><small class="label label-danger">{{ __('Error') }}</small></td>
                                         @endif
                                     </tr>
                                 @endforeach
                             </table>
                         @else()
                             <div class="callout callout-danger">
-                                <h4>Private Plugins detected</h4>
-                                <p>You are using private plugins. Private plugins are not supported by the updater. Therefore it will not work.</p>
+                                <h4>{{ __('Private plugins detected') }}</h4>
+                                <p>{{ __('You are using private plugins. The updater does not support them, so it will not work.') }}</p>
                             </div>
                         @endif
                     </div><!-- /.tab-pane -->

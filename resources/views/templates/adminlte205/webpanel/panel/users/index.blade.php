@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,14 +18,14 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Users')
+@section('title', __('Users'))
 
-@section('subtitle', 'Overview')
+@section('subtitle', __('Overview'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Users</li>
-    <li class="active">Overview</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Users') }}</li>
+    <li class="active">{{ __('Overview') }}</li>
 @stop
 
 @section('content')
@@ -32,15 +33,15 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">All Users</h3>
+                    <h3 class="box-title">{{ __('All Users') }}</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <table class="table table-bordered">
                         <tr>
                             <th style="width: 10px">#</th>
-                            <th>Name</th>
-                            <th>E-Mail</th>
-                            <th>Actions</th>
+                            <th>{{ __('Name') }}</th>
+                            <th>{{ __('E-Mail') }}</th>
+                            <th>{{ __('Actions') }}</th>
                         </tr>
                         @foreach($users as $user)
                             <tr>
@@ -51,12 +52,12 @@
                                     <div>
                                         <div style="float: right">
                                             {!! Form::open(['method' => 'DELETE', 'url' => route('webpanel.panel.users.destroy',$user->id)]) !!}
-                                            {!! Form::submit('Remove',['class' => 'btn btn-danger']) !!}
+                                            {!! Form::submit(__('Remove'),['class' => 'btn btn-danger']) !!}
                                             {!! Form::close() !!}
                                         </div>
                                         <div style="float: right">
                                             {!! Form::open(['method' => 'GET', 'url' => route('webpanel.panel.users.edit',$user->id)]) !!}
-                                            {!! Form::submit('Edit',['class' => 'btn btn-warning']) !!}
+                                            {!! Form::submit(__('Edit'),['class' => 'btn btn-warning']) !!}
                                             {!! Form::close() !!}
                                         </div>
                                     </div>

@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,14 +18,14 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Role')
+@section('title', __('Roles'))
 
-@section('subtitle', 'Overview')
+@section('subtitle', __('Overview'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Role</li>
-    <li class="active">Overview</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Roles') }}</li>
+    <li class="active">{{ __('Overview') }}</li>
 @stop
 
 @section('content')
@@ -32,16 +33,16 @@
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">All Users</h3>
+                    <h3 class="box-title">{{ __('All Roles') }}</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <table class="table table-bordered">
                         <tr>
                             <th style="width: 10px">#</th>
-                            <th>Name</th>
-                            <th>Display Name</th>
-                            <th>Description</th>
-                            <th>Actions</th>
+                            <th>{{ __('Name') }}</th>
+                            <th>{{ __('Display Name') }}</th>
+                            <th>{{ __('Description') }}</th>
+                            <th>{{ __('Actions') }}</th>
                         </tr>
                         @foreach($roles as $role)
                             <tr>
@@ -53,12 +54,12 @@
                                     <div>
                                         <div style="float: right">
                                             {!! Form::open(['method' => 'DELETE', 'url' => route('webpanel.panel.roles.destroy',$role->id)]) !!}
-                                            {!! Form::submit('Remove',['class' => 'btn btn-danger']) !!}
+                                            {!! Form::submit(__('Remove'),['class' => 'btn btn-danger']) !!}
                                             {!! Form::close() !!}
                                         </div>
                                         <div style="float: right">
                                             {!! Form::open(['method' => 'GET', 'url' => route('webpanel.panel.roles.edit',$role->id)]) !!}
-                                            {!! Form::submit('Edit',['class' => 'btn btn-warning']) !!}
+                                            {!! Form::submit(__('Edit'),['class' => 'btn btn-warning']) !!}
                                             {!! Form::close() !!}
                                         </div>
                                     </div>

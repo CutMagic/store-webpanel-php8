@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -32,31 +33,31 @@
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('name', 'Name') !!}
+                    {!! Form::label('name', __('Name')) !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('display_name', 'Display Name') !!}
+                    {!! Form::label('display_name', __('Display Name')) !!}
                     {!! Form::text('display_name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('description', 'Description') !!}
+                    {!! Form::label('description', __('Description')) !!}
                     {!! Form::text('description', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('type', 'Type') !!}
+                    {!! Form::label('type', __('Type')) !!}
                     {!! Form::text('type', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('loadout_slot', 'Loadout Slot') !!}
+                    {!! Form::label('loadout_slot', __('Loadout Slot')) !!}
                     {!! Form::text('loadout_slot', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('price', 'Price') !!}
+                    {!! Form::label('price', __('Price')) !!}
                     {!! Form::text('price', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('category_id', 'Category ID') !!}
+                    {!! Form::label('category_id', __('Category ID')) !!}
                     {!! Form::select('category_id', $categories, null,['id' => 'category_id','class' => 'form-control']) !!}
                 </div>
             </div><!-- /.box-body -->
@@ -68,15 +69,15 @@
     <div class="col-md-6">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab_1" data-toggle="tab">Optional Settings</a></li>
-                <li><a href="#tab_2" data-toggle="tab">Attrs</a></li>
-                <li><a href="#tab_3" data-toggle="tab">Server Restriction</a></li>
+                <li class="active"><a href="#tab_1" data-toggle="tab">{{ __('Optional Settings') }}</a></li>
+                <li><a href="#tab_2" data-toggle="tab">{{ __('Attrs') }}</a></li>
+                <li><a href="#tab_3" data-toggle="tab">{{ __('Server Restriction') }}</a></li>
                 <!--<li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>-->
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="tab_1">
                     <div class="form-group">
-                        {!! Form::label('priority', 'Priority') !!}
+                        {!! Form::label('priority', __('Priority')) !!}
                         <div class="row margin">
                             <div class="col-sm-12">
                                 {!! Form::text('priority') !!}
@@ -84,36 +85,36 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        {!! Form::label('web_description', 'Web Description') !!}
+                        {!! Form::label('web_description', __('Web Description')) !!}
                         {!! Form::text('web_description', null, ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group">
                         {!! Form::hidden('is_buyable',0) !!}
                         {!! Form::checkbox('is_buyable') !!}
-                        {!! Form::label('is_buyable', 'Is Buyable') !!}
+                        {!! Form::label('is_buyable', __('Is Buyable')) !!}
                     </div>
                     <div class="form-group">
                         {!! Form::hidden('is_tradeable',0) !!}
                         {!! Form::checkbox('is_tradeable') !!}
-                        {!! Form::label('is_tradeable', 'is Tradeable') !!}
+                        {!! Form::label('is_tradeable', __('Is Tradeable')) !!}
                     </div>
                     <div class="form-group">
                         {!! Form::hidden('is_refundable',0) !!}
                         {!! Form::checkbox('is_refundable') !!}
-                        {!! Form::label('is_refundable', 'Is Refundable') !!}
+                        {!! Form::label('is_refundable', __('Is Refundable')) !!}
                     </div>
                     <div class="form-group">
-                        {!! Form::label('expiry_time', 'Expiry Time') !!}
+                        {!! Form::label('expiry_time', __('Expiry Time')) !!}
                         {!! Form::text('expiry_time', null, ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group">
-                        {!! Form::label('flags', 'Flags') !!}
+                        {!! Form::label('flags', __('Flags')) !!}
                         {!! Form::text('flags', null, ['class' => 'form-control']) !!}
                     </div>
                 </div><!-- /.tab-pane -->
                 <div class="tab-pane" id="tab_2">
                     <div class="form-group">
-                        {!! Form::label('attrs', 'Attrs') !!}
+                        {!! Form::label('attrs', __('Attrs')) !!}
                         {!! Form::textarea('attrs', null, ['class' => 'form-control']) !!} <!-- TODO: Repalce with textarea with json highlighting-->
                     </div>
                 </div><!-- /.tab-pane -->
@@ -122,25 +123,25 @@
                         <div class="box-header with-border">
                             <h4 class="box-title">
                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                    Setting up Server Restrictions
+                                    {{ __('Setting up server restrictions') }}
                                 </a>
                             </h4>
                         </div>
                         <div id="collapseOne" class="panel-collapse collapse">
                             <div class="box-body">
-                                If you would like to restrict a item to a specific server, then you have to enable server restrictions for that item by checking the checkbox "Enable Server Restrictions".
+                                {{ __('To limit this item to some servers, tick "Enable Server Restriction".') }}
                                 <br>
-                                Once you have done that, you have to enter your servers below.
+                                {{ __('Then choose the servers below.') }}
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         {!! Form::hidden('enable_server_restriction',0) !!}
                         {!! Form::checkbox('enable_server_restriction') !!}
-                        {!! Form::label('enable_server_restriction', 'Enable Server Restriction') !!}
+                        {!! Form::label('enable_server_restriction', __('Enable Server Restriction')) !!}
                     </div>
                     <div class="form-group">
-                        {!! Form::label('server_list', 'Servers') !!}
+                        {!! Form::label('server_list', __('Servers')) !!}
                         {!! Form::select('server_list[]', $servers, $current_servers,['id' => 'server_list','class' => 'form-control','multiple']) !!}
                     </div>
                     <div class="form-group">
@@ -152,7 +153,7 @@
         <!--
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">Optional Entries</h3>
+                <h3 class="box-title">{{ __('Optional Entries') }}</h3>
             </div>
             <div class="box-body">
             </div>
@@ -179,10 +180,10 @@
         });
 
         $('#category_id').select2({
-            placeholder: 'Select a Category'
+            placeholder: {!! json_encode(__('Select a Category')) !!}
         });
         $('#server_list').select2({
-            placeholder: 'Select a Server'
+            placeholder: {!! json_encode(__('Select a Server')) !!}
         });
     </script>
 @endsection

@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -23,15 +24,15 @@
             </div><!-- /.box-header -->
             <div class="box-body">
                 <div class="form-group">
-                    {!! Form::label('auth', 'Auth ID') !!}
+                    {!! Form::label('auth', __('Auth ID')) !!}
                     {!! Form::text('auth', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('name', 'User Name') !!}
+                    {!! Form::label('name', __('User Name')) !!}
                     {!! Form::text('name', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('credits', 'User Credits') !!}
+                    {!! Form::label('credits', __('User Credits')) !!}
                     {!! Form::text('credits', null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="box-footer">
@@ -54,12 +55,12 @@
     <div class="col-md-6">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">User Items</h3>
+                <h3 class="box-title">{{ __('User Items') }}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
-                Add new User Items
+                {{ __('Add new user items') }}
 
-                Remove User Items
+                {{ __('Remove user items') }}
             </div><!-- /.box-body -->
             <!--
             <div class="box-footer clearfix">

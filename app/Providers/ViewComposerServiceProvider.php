@@ -47,14 +47,18 @@ class ViewComposerServiceProvider extends ServiceProvider
      */
     public function ComposeWebPanelSidebar()
     {
-        view()->composer('templates.' . \Config::get('webpanel.template') . 'webpanel.includes.sidebar', function ($view) {
-            $view->with('storeItemCount', StoreItem::all()->count());
-            $view->with('storeCategoryCount', StoreCategory::all()->count());
-            $view->with('storeUserCount', StoreUser::all()->count());
-            $view->with('storeServerCount', StoreServer::all()->count());
-            $view->with('panelUserCount', User::all()->count());
-            $view->with('panelRoleCount', Role::all()->count());
-            $view->with('panelPermissionCount', Permission::all()->count());
+        // [multimod] aussi pour le tableau de bord admin ; count() en SQL au lieu de charger toutes les lignes
+        view()->composer([
+            'templates.' . \Config::get('webpanel.template') . 'webpanel.includes.sidebar',
+            'templates.' . \Config::get('webpanel.template') . 'webpanel.includes.dashboard-boxes',
+        ], function ($view) {
+            $view->with('storeItemCount', StoreItem::count());
+            $view->with('storeCategoryCount', StoreCategory::count());
+            $view->with('storeUserCount', StoreUser::count());
+            $view->with('storeServerCount', StoreServer::count());
+            $view->with('panelUserCount', User::count());
+            $view->with('panelRoleCount', Role::count());
+            $view->with('panelPermissionCount', Permission::count());
         });
     }
 

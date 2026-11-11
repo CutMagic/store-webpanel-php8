@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Servers')
+@section('title', __('Servers'))
 
-@section('subtitle', 'Edit')
+@section('subtitle', __('Edit'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Servers</li>
-    <li class="active">Edit</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Servers') }}</li>
+    <li class="active">{{ __('Edit') }}</li>
 @stop
 
 @section('content')
     {!! Form::model($server,['method' => 'PATCH','route' => ['webpanel.store.servers.update',$server->id]]) !!}
-    @include('templates.adminlte205.webpanel.store.servers._form',['LeftMenuTitle'=>'Edit Server '.$server->name,'SubmitButtonText' => 'Edit Server'])
+    @include('templates.adminlte205.webpanel.store.servers._form',['LeftMenuTitle' => __('Edit Server :name', ['name' => $server->name]),'SubmitButtonText' => __('Edit Server')])
     {!! Form::close() !!}
 @stop

@@ -126,7 +126,7 @@ class ToolsController extends Controller
         // de lire / supprimer n'importe quel fichier du site
         $fileName = basename((string) $request->input('fileName'));
         if (!preg_match('/^\d{6}\.json$/', $fileName) || !Storage::exists('uploads/' . $fileName)) {
-            abort(400, "Fichier d'import invalide");
+            abort(400, __('Invalid import file.'));
         }
         $json_string = Storage::get('uploads/' . $fileName);
 

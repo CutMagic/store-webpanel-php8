@@ -1,0 +1,141 @@
+STORE WEBPANEL - PHP 8 - INSTALLATION
+=====================================
+
+Panneau web pour le plugin SourceMod "Store 1.2 Final" (Drixevel), Counter-Strike: Source.
+Panneau d'administration (objets, catégories, joueurs et crédits, serveurs, rôles admin) et espace
+joueur (crédits, inventaire, boutique, objets équipés, classement des joueurs) avec connexion Steam.
+Basé sur SourceMod-Store WebPanel-Core 2.0.1 (Werner Maisl, AGPLv3), porté sur Laravel 12 / PHP 8.2.
+Failles corrigées : voir SECURITY-FIXES.txt. Version anglaise de ce fichier : INSTALL.txt.
+
+
+PRÉREQUIS
+---------
+- PHP 8.2 ou plus récent (8.3, 8.4) avec les extensions : pdo_mysql, mbstring, openssl, tokenizer, xml,
+  ctype, fileinfo, curl.
+- MySQL / MariaDB avec la base du plugin Store 1.2.
+- Le plugin SourceMod Store 1.2 sur le ou les serveurs de jeu.
+
+Deux bases (ou une seule) :
+- base du PANNEAU : tables webpanel_* (comptes admin, rôles, serveurs), créées par l'installateur.
+- base du STORE : tables store_* du plugin. Le panneau lit et modifie les données (crédits,
+  objets...) mais ne change jamais la structure des tables.
+Les deux peuvent être la même base : les préfixes webpanel_ et store_ les séparent.
+Base du store neuve : sql/store-tables-vierges.sql (dans plugin-sourcemod-store.zip) crée les tables vides.
+
+
+1. ENVOYER LES FICHIERS
+-----------------------
+Télécharger store-webpanel-php8-*.zip sur la page "Releases" de GitHub (le dossier vendor est fourni,
+pas besoin de Composer) et l'envoyer sur l'hébergement. Trois possibilités, de la meilleure à la moins
+bonne :
+
+  a) Le (sous-)domaine pointe sur le dossier "public" (ex. store.monsite.fr -> .../store/public).
+     Seul le contenu de "public" est visible depuis le web : c'est le plus sûr.
+
+  b) Tout le dossier dans le dossier web (ex. public_html/store) sur un hébergeur APACHE ou
+     LITESPEED (la plupart des hébergeurs mutualisés). Le fichier .htaccess de la racine du panneau
+     envoie toutes les requêtes vers "public" (l'adresse reste monsite.fr/store) et bloque .env,
+     storage, vendor, etc.
+
+  c) NGINX : les fichiers .htaccess sont ignorés. Faire pointer la racine du site sur le dossier
+     "public" (possibilité a).
+
+  !!! ATTENTION - Si tu modifies le .htaccess de la racine du panneau, GARDE SA PARTIE 1
+  !!! ("PROTECTION"). Sans elle, ton fichier .env (mots de passe MySQL et SMTP) peut être lisible par
+  !!! tout le monde à l'adresse monsite.fr/store/.env.
+  !!! Le fichier index.php de la racine ne sert que de secours : si la réécriture d'adresse ne marche
+  !!! plus, il renvoie les visiteurs vers public/, mais il ne protège PAS .env. Ne supprime pas non plus
+  !!! storage/.htaccess.
+
+Donner au serveur web les droits d'écriture sur le dossier du panneau (pour créer .env et INSTALLED),
+sur storage/ et sur bootstrap/cache/.
+
+
+2. INSTALLATEUR WEB (SANS SSH)
+------------------------------
+Ouvrir https://monsite.fr/store/installer JUSTE APRÈS l'envoi des fichiers (tant que l'installation
+n'est pas finie, n'importe qui peut ouvrir l'installateur).
+
+- À la première visite, le panneau crée lui-même son fichier .env (à partir de .env.example) et sa
+  propre clé de chiffrement unique.
+- Remplir la base du panneau, la base du store et les réglages SMTP.
+- L'installateur crée les tables du panneau (webpanel_* seulement) et le premier compte admin, avec un
+  mot de passe tiré au hasard écrit dans storage/app/premier-admin.txt.
+- À la fin, il crée le fichier INSTALLED (l'installateur est alors fermé pour toujours) et VÉRIFIE
+  DEPUIS LE WEB QUE .env, storage ET composer.json NE SONT PAS LISIBLES.
+  En cas d'alerte rouge : corriger tout de suite (voir l'étape 1), puis changer tes mots de passe
+  MySQL et SMTP.
+  Si ton hébergeur empêche le site de s'appeler lui-même, la page donne les liens à ouvrir à la main :
+  chacun doit afficher une erreur 403 ou 404.
+
+
+3. APRÈS L'INSTALLATION
+-----------------------
+1. Se connecter sur /login avec le compte écrit dans storage/app/premier-admin.txt.
+2. Panneau > Utilisateurs : mettre ta vraie adresse e-mail (utilisée par "mot de passe oublié") et un mot
+   de passe solide. Supprimer ensuite storage/app/premier-admin.txt.
+3. Store > Serveurs : ajouter chaque serveur de jeu avec le même ID que son "server_id" dans le fichier
+   configs/store/core.cfg du Store.
+4. Si le site est en https, vérifier que SESSION_SECURE_COOKIE=true dans .env (l'installateur le met
+   tout seul quand il est ouvert en https).
+5. Conseillé : "php artisan config:cache" et "php artisan route:cache" (à refaire après chaque
+   modification du .env).
+
+
+INSTALLATION À LA MAIN (SSH / COMPOSER)
+---------------------------------------
+    git clone https://github.com/cutmagic/store-webpanel-php8.git
+    cd store-webpanel-php8
+    composer install --no-dev --optimize-autoloader
+    cp .env.example .env              (puis remplacer base-name, user-name, xxxxxxx, localhost, APP_URL)
+    php artisan key:generate --force
+    php artisan migrate --force       (tables webpanel_* + premier compte admin)
+    echo INSTALLED > INSTALLED        (ferme l'installateur web)
+
+
+MAILS ("MOT DE PASSE OUBLIÉ" DES COMPTES ADMIN)
+-----------------------------------------------
+Les joueurs n'ont pas de mot de passe (connexion Steam). Pour les admins, "Mot de passe oublié ?" sur
+/login envoie un LIEN à usage unique (jamais le mot de passe), valable 60 minutes.
+- Mettre les réglages SMTP de ton hébergeur dans .env : MAIL_HOST, MAIL_PORT, MAIL_USERNAME,
+  MAIL_PASSWORD, MAIL_FROM_ADDRESS. Port 465 = SSL, port 587 = STARTTLS.
+- MAIL_FROM_ADDRESS doit être une adresse du domaine de ton serveur mail, sinon les mails partent en spam.
+- Le lien est construit avec APP_URL : ce doit être l'adresse exacte du site.
+- Pour tester sans envoyer : MAIL_MAILER=log (le mail est écrit dans storage/logs/).
+
+
+À SAVOIR
+--------
+- Ne jamais activer USERPANEL_DEV_LOGIN sur un site en ligne (connexion de test comme n'importe quel joueur).
+- Outils > Importer : importer une catégorie SUPPRIME D'ABORD les catégories qui ont le même
+  "require_plugin", avec leurs objets et les exemplaires possédés par les joueurs (comportement d'origine).
+- Les tables du Store 1.2 sont en MyISAM (pas de transactions) : chaque modification de crédits est une
+  seule requête atomique, comme dans le plugin.
+- La connexion "store" utilise latin1, comme le plugin : les pseudos s'affichent comme en jeu.
+- Tout le site (accueil, connexion, espace joueur et panneau admin) est en français ou en anglais :
+  bouton FR / EN, gardé un an ; langue par défaut : APP_LOCALE dans .env. Les textes français sont dans
+  lang/fr.json (le texte anglais du code sert de clé).
+- Page "Joueurs" (espace joueur) : classement par crédits, recherche par pseudo ou SteamID (STEAM_0:...,
+  [U:1:...], SteamID64, lien du profil Steam) et profil de chaque joueur (SteamID, lien vers son profil
+  Steam, objets possédés et équipés), en lecture seule, pour les joueurs connectés seulement. Dans .env :
+  USERPANEL_PLAYER_PROFILES=false coupe la page, USERPANEL_PLAYER_PROFILES_CREDITS=false cache les
+  crédits et le rang des autres joueurs.
+
+
+PLUGIN DU STORE (plugin-sourcemod-store.zip, sur la page Releases)
+-----------------------------------------------------------------
+Basé sur "Store 1.2 Final" de Drixevel (Keith Warren, aujourd'hui KeithGDR sur GitHub) :
+https://github.com/Drixevel/store/tree/1.2-Final  - lui-même basé sur le Store d'alongub (GPLv3) :
+https://github.com/alongubkin/store
+Notre version est mise à jour pour SourceMod 1.12 : modules d'objets adaptés et recompilés avec
+SourceMod 1.12, passés de l'ancienne extension SMJansson à "Jansson in Pawn" (OBLIGATOIRE :
+https://github.com/rejchev/sm-jansson), 2 petites corrections du cœur du store, traduction française
+complète, et sql/store-tables-vierges.sql pour créer les tables vides du store.
+https://github.com/KeithGDR/sm-store (2025, même auteur) est une AUTRE version du store : ne pas
+mélanger ses fichiers avec ce pack.
+
+
+LICENCE
+-------
+GNU Affero General Public License v3 (voir LICENSE), comme le WebPanel-Core d'origine de Werner Maisl.
+Si tu modifies ce panneau et le mets en ligne, tu dois proposer ton code modifié à ses utilisateurs.

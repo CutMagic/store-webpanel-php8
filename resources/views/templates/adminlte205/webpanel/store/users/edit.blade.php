@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'User')
+@section('title', __('Users'))
 
-@section('subtitle', 'Edit')
+@section('subtitle', __('Edit'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Users</li>
-    <li class="active">Edit</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Users') }}</li>
+    <li class="active">{{ __('Edit') }}</li>
 @stop
 
 @section('content')
     {!! Form::model($store_user,['method' => 'PATCH','route' => ['webpanel.store.users.update',$store_user->id]]) !!}
-    @include('templates.adminlte205.webpanel.store.users._form',['LeftMenuTitle'=>'Edit User '.$store_user->name,'SubmitButtonText' => 'Edit User'])
+    @include('templates.adminlte205.webpanel.store.users._form',['LeftMenuTitle' => __('Edit User :name', ['name' => $store_user->name]),'SubmitButtonText' => __('Edit User')])
     {!! Form::close() !!}
 @stop

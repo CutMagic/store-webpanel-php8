@@ -53,7 +53,7 @@ class VersionsController extends Controller
         {
             $versions = array();
             return view('templates.' . \Config::get('webpanel.template') . 'webpanel.store.versions.index', compact('versions'))
-                ->with("flash_notification",array("message"=>"Master Version Mismatch", "level"=>"error"));
+                ->with("flash_notification",array("message"=>__('Master version mismatch'), "level"=>"error"));
         }
 
         //Get days since the last update

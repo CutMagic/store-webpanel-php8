@@ -43,12 +43,12 @@ class Authorize
             if ($routeName === 'webpanel.dashboard') {
                 return $next($request);
             }
-            abort(403, 'Aucune permission définie pour cette page');
+            abort(403, __('No permission is defined for this page.'));
         }
 
         if (!Auth::user() || !Auth::user()->hasPermission($routePermission)) {
             return redirect()->route('webpanel.dashboard')
-                ->withErrors(['You do not have the permission ' . $routePermission . ' that is required to perform this action']);
+                ->withErrors([__('You do not have the permission ":permission" required for this action.', ['permission' => $routePermission])]);
         }
 
         return $next($request);

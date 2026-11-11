@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Roles')
+@section('title', __('Roles'))
 
-@section('subtitle', 'Overview')
+@section('subtitle', __('Create'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Roles</li>
-    <li class="active">Create</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Roles') }}</li>
+    <li class="active">{{ __('Create') }}</li>
 @stop
 
 @section('content')
     {!! Form::open(['route' => 'webpanel.panel.roles.store']) !!}
-        @include('templates.adminlte205.webpanel.panel.roles._form',['LeftMenuTitle'=>'Create a new Role','SubmitButtonText' => 'Create Role'])
+        @include('templates.adminlte205.webpanel.panel.roles._form',['LeftMenuTitle' => __('Create a new Role'),'SubmitButtonText' => __('Create Role')])
     {!! Form::close() !!}
 @stop

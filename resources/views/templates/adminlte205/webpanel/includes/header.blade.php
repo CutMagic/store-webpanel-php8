@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -16,7 +17,7 @@
 {{--along with this program. If not, see <http://www.gnu.org/licenses/>.--}}
 <header class="main-header">
     <!-- Logo -->
-    <a href="index2.html" class="logo"><b>Admin</b>Panel</a>
+    <a href="{{ route('webpanel.dashboard') }}" class="logo"><b>Admin</b>Panel</a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top" role="navigation">
         <!-- Sidebar toggle button-->
@@ -26,6 +27,7 @@
         <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
+                @include('templates.adminlte205.includes.langswitch', ['style' => 'nav'])
                 {{--<!-- Messages: style can be found in dropdown.less-->--}}
                 {{--<li class="dropdown messages-menu">--}}
                     {{--<a href="#" class="dropdown-toggle" data-toggle="dropdown">--}}
@@ -226,7 +228,7 @@
                             <img src="{{asset('templates/adminlte205/dist/img/user2-160x160.jpg')}}" class="img-circle" alt="User Image" />
                             <p>
                                 {{$username}}
-                                <small>Member since quite some time</small><!-- FIXME: Add the actual date here-->
+                                <small>{{ __('Administrator') }}</small>
                             </p>
                         </li>
                         <!-- Menu Body -->
@@ -244,10 +246,10 @@
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a href="#" class="btn btn-default btn-flat">Profile</a><!-- TODO: Add a actual profile page-->
+                                <a href="{{ url('/') }}" class="btn btn-default btn-flat">{{ __('Home page') }}</a>
                             </div>
                             <div class="pull-right">
-                                <a href="{{URL::route('logout')}}" class="btn btn-default btn-flat">Sign out</a>
+                                <a href="{{URL::route('logout')}}" class="btn btn-default btn-flat">{{ __('Log out') }}</a>
                             </div>
                         </li>
                     </ul>

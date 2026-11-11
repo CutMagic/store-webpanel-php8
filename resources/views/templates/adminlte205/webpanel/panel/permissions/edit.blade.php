@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,18 +18,18 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Permissions')
+@section('title', __('Permissions'))
 
-@section('subtitle', 'Edit')
+@section('subtitle', __('Edit'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Permissions</li>
-    <li class="active">Edit</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Permissions') }}</li>
+    <li class="active">{{ __('Edit') }}</li>
 @stop
 
 @section('content')
     {!! Form::model($permission,['method' => 'PATCH','route' => ['webpanel.panel.permissions.update',$permission->id]]) !!}
-    @include('templates.adminlte205.webpanel.panel.permissions._form',['LeftMenuTitle'=>'Edit Permission '.$permission->name,'SubmitButtonText' => 'Edit Permission'])
+    @include('templates.adminlte205.webpanel.panel.permissions._form',['LeftMenuTitle' => __('Edit Permission :name', ['name' => $permission->name]),'SubmitButtonText' => __('Edit Permission')])
     {!! Form::close() !!}
 @stop

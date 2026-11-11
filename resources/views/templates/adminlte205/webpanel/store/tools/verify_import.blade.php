@@ -1,3 +1,4 @@
+{{-- [multimod] i18n : textes traduits (anglais dans le code, français dans lang/fr.json) --}}
 {{--Copyright (c) 2015 "Werner Maisl"--}}
 
 {{--This file is part of the Store Webpanel V2.--}}
@@ -17,14 +18,14 @@
 
 @extends('templates.adminlte205.webpanel.app')
 
-@section('title', 'Tools')
+@section('title', __('Tools'))
 
-@section('subtitle', 'Verify Import')
+@section('subtitle', __('Verify Import'))
 
 @section('breadcrumb')
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    <li class="active">Tools</li>
-    <li class="active">Importer</li>
+    <li><a href="{{ route('webpanel.dashboard') }}"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+    <li class="active">{{ __('Tools') }}</li>
+    <li class="active">{{ __('Import') }}</li>
 @stop
 
 @section('content')
@@ -34,20 +35,20 @@
             {!! Form::hidden('fileName',$fileName)!!}
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">Overview</h3>
+                    <h3 class="box-title">{{ __('Overview') }}</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body"> <!-- TODO: Replace these with info messages -->
                     @if($json_version == 0)
-                        You are trying to import a legacy json object
+                        {{ __('You are trying to import a legacy JSON object.') }}
                     @else
-                        You are trying to import a version {{$json_version}} json object
+                        {{ __('You are trying to import a version :version JSON object.', ['version' => $json_version]) }}
                     @endif
                     <br>
-                    You are trying to import {{$json_type}}
+                    {{ __('You are trying to import: :type', ['type' => $json_type]) }}
 
                 </div><!-- /.box-body -->
                 <div class="box-footer">
-                    {!! Form::submit("Proceed", ['class' => 'btn btn-primary']) !!}
+                    {!! Form::submit(__('Proceed'), ['class' => 'btn btn-primary']) !!}
                 </div>
             </div><!-- /.box -->
             {!! Form::close() !!}
@@ -55,7 +56,7 @@
         <div class="col-md-6">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">Detailed Information</h3>
+                    <h3 class="box-title">{{ __('Detailed Information') }}</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <!-- TODO: List the categories / items here -->
