@@ -1,0 +1,114 @@
+STORE WEBPANEL - PHP 8 : FAILLES CORRIGÉES / FIXED SECURITY ISSUES
+===================================================================
+
+Par rapport au WebPanel-Core 2.0.1 d'origine (SourceMod-Store/WebPanel-Core).
+Compared with the original WebPanel-Core 2.0.1 (SourceMod-Store/WebPanel-Core).
+
+
+1. XSS - pseudo piégé / booby-trapped player name
+   FR : le HTML d'un pseudo de joueur (ou d'un nom d'objet) était exécuté dans les tableaux de
+        l'administration. Toutes les sorties sont maintenant échappées.
+   EN : HTML in a player name (or item name) was executed in the admin tables. All output is
+        now escaped.
+
+2. Import : lecture / suppression de fichiers / file read and delete
+   FR : le nom du fichier temporaire de l'import n'était pas vérifié : avec "../", un compte admin
+        pouvait lire ou supprimer n'importe quel fichier du site. Nom vérifié, seul l'import JSON
+        (2 Mo max) est accepté, rangé hors du dossier web.
+   EN : the import temp file name was not checked: with "../" an admin account could read or
+        delete any file of the site. The name is now checked; only JSON imports (2 MB max) are
+        accepted, stored outside the web folder.
+
+3. Permissions contournées / bypassed permissions
+   FR : l'import, l'export, la mise à jour des versions et toutes les modifications envoyées en
+        PATCH (celles des formulaires) étaient ouverts à tout compte admin, même sans permission.
+        Chaque page exige maintenant sa permission, avec refus par défaut.
+   EN : import, export, version update and every PATCH update (the one used by the edit forms)
+        were open to any admin account, even without the permission. Every page now requires its
+        permission, deny by default.
+
+4. Connexion Steam usurpable / Steam login spoofing
+   FR : une connexion Steam faite pour un autre site était acceptée. Sont maintenant vérifiés :
+        adresse de retour, serveur Steam, champs signés, jeton à usage unique (anti-rejeu), puis
+        revérification auprès de Steam ; nouvelle session à chaque connexion.
+   EN : a Steam login made for another website was accepted. Now checked: return address, Steam
+        server, signed fields, single-use nonce (anti-replay), then re-check with Steam; new
+        session on every login.
+
+5. Mots de passe admin / admin passwords
+   FR : le mot de passe était enregistré en clair à la création d'un compte ; à l'édition, le
+        hachage était affiché puis réenregistré comme mot de passe. Les mots de passe sont
+        maintenant toujours hachés (bcrypt) et jamais renvoyés au navigateur.
+   EN : the password was saved in plain text when an account was created; when editing, the
+        hash was shown and saved back as the password. Passwords are now always hashed (bcrypt)
+        and never sent back to the browser.
+
+6. Compte admin par défaut / default admin account
+   FR : le compte créé à l'installation avait le mot de passe "password". Il est maintenant tiré
+        au hasard. L'inscription libre au panneau admin est fermée.
+   EN : the account created at installation had the password "password". It is now random.
+        Open registration to the admin panel is closed.
+
+7. Force brute / brute force
+   FR : aucune limite d'essais à la connexion admin. Maximum 5 essais ratés par minute.
+   EN : no limit on admin login attempts. Now 5 failed attempts per minute at most.
+
+8. Mise à jour des versions / version update
+   FR : les fichiers de versions étaient téléchargés sans contrôler l'adresse (file://, adresses
+        internes ou "../" possibles). Seules des adresses https raw.githubusercontent.com et des
+        noms simples sont acceptés.
+   EN : version files were downloaded without checking the address (file://, internal addresses
+        or "../" were possible). Only https raw.githubusercontent.com addresses and simple names
+        are accepted.
+
+9. Avatars Steam
+   FR : un avatar pouvait être téléchargé et stocké pour n'importe quel numéro. Limité aux joueurs
+        du store, et l'image doit venir des serveurs d'avatars de Steam.
+   EN : an avatar could be downloaded and stored for any number. Limited to store players, and the
+        image must come from Steam's avatar servers.
+
+10. Espace joueur (réécrit pour le Store 1.2) / player area (rewritten for Store 1.2)
+    FR : les objets réservés aux admins (flags) ne s'achètent pas sur le site ; achats et ventes
+         modifient les crédits en une seule requête (pas de double dépense) ; un joueur n'agit que
+         sur ses propres objets (identité tirée de la session).
+    EN : admin-only items (flags) cannot be bought on the site; purchases and sales change
+         credits in a single query (no double spending); a player can only act on their own items
+         (identity taken from the session).
+
+11. Injection SQL / SQL injection
+    FR : les noms de colonnes envoyés par les tableaux de l'administration sont limités à une liste.
+    EN : column names sent by the admin tables are limited to an allow-list.
+
+12. Mot de passe oublié / password reset
+    FR : remplacé par un lien à usage unique (60 min), jeton haché, construit avec APP_URL (un
+         en-tête Host truqué ne peut pas détourner le lien), même réponse que l'adresse existe ou
+         non, demandes limitées, anciennes sessions déconnectées après le changement.
+    EN : replaced by a single-use link (60 min), hashed token, built from APP_URL (a forged Host
+         header cannot hijack the link), same answer whether the address exists or not, rate
+         limited, old sessions logged out after the change.
+
+13. Installateur / installer
+    FR : il tournait en mode debug (qui affiche la configuration, mots de passe compris) et un
+         retour à la ligne dans un champ pouvait injecter des lignes dans .env. Mode production,
+         valeurs nettoyées et entre guillemets, mots de passe masqués à la saisie.
+    EN : it ran in debug mode (which shows the configuration, passwords included) and a line
+         break in a field could inject lines into .env. Production mode, values cleaned and
+         quoted, passwords masked while typing.
+
+14. Fichier .env lisible / readable .env file
+    FR : si tout le dossier était envoyé dans le dossier web, .env (mots de passe MySQL et SMTP)
+         pouvait être lu à l'adresse /.env. Ajout d'un .htaccess à la racine et dans storage/, et
+         d'une vérification automatique à la fin de l'installation.
+    EN : if the whole folder was uploaded to the web folder, .env (MySQL and SMTP passwords)
+         could be read at /.env. Added a .htaccess file at the root and in storage/, and an
+         automatic check at the end of the installation.
+
+15. Clickjacking et en-têtes / clickjacking and headers
+    FR : ajout des en-têtes X-Frame-Options, X-Content-Type-Options et Referrer-Policy.
+    EN : added the X-Frame-Options, X-Content-Type-Options and Referrer-Policy headers.
+
+16. Connexion de test / test login
+    FR : la connexion "depuis le serveur" (inexistante dans le Store 1.2) est désactivée ; la
+         connexion de test joueur ne marche qu'avec APP_ENV=local et USERPANEL_DEV_LOGIN=true.
+    EN : the "server login" (not part of Store 1.2) is disabled; the test player login only works
+         with APP_ENV=local and USERPANEL_DEV_LOGIN=true.

@@ -1,0 +1,115 @@
+STORE WEBPANEL - PHP 8 - INSTALLATION
+=====================================
+
+Web panel for the SourceMod "Store 1.2 Final" plugin (Drixevel), Counter-Strike: Source.
+Admin panel (items, categories, players and credits, servers, admin roles) and player area
+(credits, inventory, shop, equipped items) with Steam login.
+Based on SourceMod-Store WebPanel-Core 2.0.1 (Werner Maisl, AGPLv3), ported to Laravel 12 / PHP 8.2.
+Fixed security issues: see SECURITY-FIXES.txt.
+
+
+REQUIREMENTS
+------------
+- PHP 8.2 or newer (8.3, 8.4) with these extensions: pdo_mysql, mbstring, openssl, tokenizer, xml,
+  ctype, fileinfo, curl.
+- MySQL / MariaDB with the database of the Store 1.2 plugin.
+- The Store 1.2 SourceMod plugin on your game server(s).
+
+Two databases (or one):
+- PANEL database: webpanel_* tables (admin accounts, roles, servers), created by the installer.
+- STORE database: store_* tables of the plugin. The panel reads and changes the data
+  (credits, items...) but never changes the table structure.
+Both can be the same database: the webpanel_ and store_ prefixes keep them apart.
+
+
+1. UPLOAD THE FILES
+-------------------
+Download store-webpanel-php8-*.zip from the GitHub "Releases" page (the vendor folder is included,
+Composer is not needed) and upload it to your web host. Three options, best first:
+
+  a) Point the (sub)domain to the "public" folder (e.g. store.mysite.com -> .../store/public).
+     Only the content of "public" can be reached from the web. This is the safest option.
+
+  b) Whole folder inside the web folder (e.g. public_html/store) on an APACHE or LITESPEED host
+     (most shared hosts). The .htaccess file at the root of the panel sends every request to
+     "public" (the address stays mysite.com/store) and blocks .env, storage, vendor, etc.
+
+  c) NGINX: .htaccess files are ignored. Point the site root to the "public" folder (option a).
+
+  !!! WARNING - If you edit the .htaccess file at the root of the panel, KEEP ITS PART 1
+  !!! ("PROTECTION"). Without it, your .env file (MySQL and SMTP passwords) may be readable by
+  !!! anyone at mysite.com/store/.env.
+  !!! The index.php file at the root is only a fallback: if URL rewriting stops working it sends
+  !!! visitors to public/, but it does NOT protect .env. Do not delete storage/.htaccess either.
+
+Give the web server write access to the panel folder (to create .env and INSTALLED), to storage/
+and to bootstrap/cache/.
+
+
+2. WEB INSTALLER (NO SSH NEEDED)
+--------------------------------
+Open https://mysite.com/store/installer RIGHT AFTER uploading the files (until the installation
+is finished, anyone can open the installer).
+
+- On the first visit the panel creates its own .env file (from .env.example) and its own unique
+  encryption key.
+- Fill in the panel database, the store database and your SMTP settings.
+- The installer creates the panel tables (webpanel_* only) and the first admin account, with a
+  random password written to storage/app/premier-admin.txt.
+- At the end it creates the INSTALLED file (the installer is then closed for good) and CHECKS FROM
+  THE WEB THAT .env, storage AND composer.json CANNOT BE READ.
+  If you get a red warning: fix it at once (see step 1), then change your MySQL and SMTP passwords.
+  If your host does not let the site call itself, the page lists the links to open by hand:
+  each one must show a 403 or 404 error.
+
+
+3. AFTER THE INSTALLATION
+-------------------------
+1. Log in at /login with the account written in storage/app/premier-admin.txt.
+2. Panel > Users: set your real e-mail address (used by "forgot password") and a strong password.
+   Then delete storage/app/premier-admin.txt.
+3. Store > Servers: add each game server with the same ID as its "server_id" in the Store's
+   configs/store/core.cfg.
+4. If the site uses https, check that SESSION_SECURE_COOKIE=true in .env (the installer sets it
+   when it is opened over https).
+5. Recommended: "php artisan config:cache" and "php artisan route:cache" (run them again after any
+   change to .env).
+
+
+MANUAL INSTALLATION (SSH / COMPOSER)
+------------------------------------
+    git clone https://github.com/cutmagic/store-webpanel-php8.git
+    cd store-webpanel-php8
+    composer install --no-dev --optimize-autoloader
+    cp .env.example .env              (then replace base-name, user-name, xxxxxxx, localhost, APP_URL)
+    php artisan key:generate --force
+    php artisan migrate --force       (webpanel_* tables + first admin account)
+    echo INSTALLED > INSTALLED        (closes the web installer)
+
+
+E-MAIL ("FORGOT PASSWORD" FOR ADMIN ACCOUNTS)
+---------------------------------------------
+Players have no password (Steam login). For admins, "Mot de passe oublié ?" on /login sends a
+one-time LINK (never the password), valid for 60 minutes.
+- Put your host's SMTP settings in .env: MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD,
+  MAIL_FROM_ADDRESS. Port 465 = SSL, port 587 = STARTTLS.
+- MAIL_FROM_ADDRESS must belong to your mail server's domain, otherwise mails end up in spam.
+- The link is built from APP_URL: it must be the exact address of the site.
+- To test without sending: MAIL_MAILER=log (the mail is written to storage/logs/).
+
+
+GOOD TO KNOW
+------------
+- Never enable USERPANEL_DEV_LOGIN on a live site (test login as any player).
+- Tools > Import: importing a category FIRST DELETES the categories with the same
+  "require_plugin", with their items and the copies owned by players (original behaviour).
+- Store 1.2 tables are MyISAM (no transactions): every credit change is a single atomic query,
+  like in the plugin.
+- The "store" database connection uses latin1, like the plugin, so player names look the same as in game.
+- The user interface of the player area is in French.
+
+
+LICENSE
+-------
+GNU Affero General Public License v3 (see LICENSE), like the original WebPanel-Core by Werner Maisl.
+If you modify this panel and run it online, you must offer your modified source code to its users.
