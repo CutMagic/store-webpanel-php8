@@ -19,7 +19,9 @@ RedirectMatch 404 (?i)/(composer\.(json|lock)|package\.json|artisan|INSTALLED|vi
     RewriteEngine On
 
     # 1 bis. dossiers internes du panneau (chemins comptés depuis ce dossier) : 404
-    RewriteRule ^(app|bootstrap|config|database|lang|resources|routes|storage|tests|vendor)(/|$) - [R=404,L]
+    #        Pas "lang" ici : /lang/fr et /lang/en sont les adresses du bouton de langue.
+    #        Le dossier lang/ reste inaccessible : la règle 2 envoie tout vers public/.
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor)(/|$) - [R=404,L]
 
     # en-tête utilisé par Laravel
     RewriteCond %{HTTP:Authorization} .
